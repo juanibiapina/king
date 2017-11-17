@@ -1,35 +1,27 @@
-extern crate ncurses;
+use ui::Ui;
 
-use self::ncurses::*;
-
-pub struct Editor;
-
-fn init() {
-    initscr();
-    keypad(stdscr(), true);
-    noecho();
-}
-
-fn finish() {
-    endwin();
+pub struct Editor {
+    ui: Ui,
 }
 
 impl Editor {
     pub fn new() -> Editor {
-        Editor
+        Editor {
+            ui: Ui::new(),
+        }
     }
 
     pub fn run(&self) {
-        init();
+        self.ui.init();
 
         loop {
-            let ch = getch();
+            let ch = self.ui.getch();
             match ch {
                 113 => break,
                 _ => continue,
             }
         }
 
-        finish();
+        self.ui.finish();
     }
 }
