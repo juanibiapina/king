@@ -43,7 +43,8 @@ impl Editor {
                             }
                         },
                         ic => {
-                            ui::addstr(&ic.to_string())
+                            ui::addstr(&ic.to_string());
+                            ui::addstr("|");
                         },
                     }
                 },
