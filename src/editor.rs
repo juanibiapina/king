@@ -28,7 +28,6 @@ impl Editor {
                 Some(Key::Code(_)) => continue,
                 Some(Key::Char(ic)) => {
                     match ic {
-                        113 => break,
                         58 => {
                             let y = ui::getcury();
                             let x = ui::getcurx();
@@ -38,7 +37,12 @@ impl Editor {
                             ui::mv(y,x);
 
                             match command {
-                                Some(text) => ui::addstr(&text),
+                                Some(text) => {
+                                    match text.as_str() {
+                                        "quit" => break,
+                                        _ => continue,
+                                    }
+                                }
                                 None => continue,
                             }
                         },
