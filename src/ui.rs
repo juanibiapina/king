@@ -2,6 +2,8 @@ extern crate ncurses;
 
 use self::ncurses::*;
 
+use key::Key;
+
 pub struct Ui;
 
 impl Ui {
@@ -19,7 +21,11 @@ impl Ui {
         endwin();
     }
 
-    pub fn getch(&self) -> i32 {
-        getch()
+    pub fn wget_wch(&self) ->  Option<Key> {
+        match wget_wch(stdscr()) {
+            Some(WchResult::KeyCode(i)) => Some(Key::Code(i)),
+            Some(WchResult::Char(ic)) => Some(Key::Char(ic)),
+            None => None,
+        }
     }
 }

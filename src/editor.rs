@@ -1,4 +1,5 @@
 use ui::Ui;
+use key::Key;
 
 pub struct Editor {
     ui: Ui,
@@ -15,10 +16,16 @@ impl Editor {
         self.ui.init();
 
         loop {
-            let ch = self.ui.getch();
-            match ch {
-                113 => break,
-                _ => continue,
+            let key = self.ui.wget_wch();
+            match key {
+                Some(Key::Code(_)) => continue,
+                Some(Key::Char(ic)) => {
+                    match ic {
+                        113 => break,
+                        _ => continue,
+                    }
+                },
+                None => continue,
             }
         }
 
