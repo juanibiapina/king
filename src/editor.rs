@@ -6,6 +6,7 @@ use error::error_message;
 
 pub struct Editor {
     prompt: Prompt,
+    running: bool,
 }
 
 impl Editor {
@@ -16,6 +17,7 @@ impl Editor {
 
         Editor {
             prompt: Prompt::new(max_y - 1),
+            running: true,
         }
     }
 
@@ -24,46 +26,62 @@ impl Editor {
     }
 
     pub fn run(&mut self) {
-        loop {
+        while self.running {
             let key = ui::get_key();
+
             match key {
-                Some(Key::Code(_)) => continue,
-                Some(Key::Char(ic)) => {
-                    match ic {
-                        58 => {
-                            let y = ui::getcury();
-                            let x = ui::getcurx();
-
-                            let text = self.prompt.run(58);
-
-                            ui::mv(y,x);
-
-                            match text {
-                                Some(text) => {
-                                    let command = Command::parse(&text);
-
-                                    match command {
-                                        Ok(command) => {
-                                            match command {
-                                                Command::Quit => break,
-                                            }
-                                        },
-                                        Err(err) => {
-                                            self.prompt.display_error(&error_message(err));
-                                        }
-                                    }
-                                }
-                                None => continue,
-                            }
-                        },
-                        ic => {
-                            ui::addstr(&ic.to_string());
-                            ui::addstr("|");
-                        },
-                    }
-                },
+                Some(key) => self.handle_key(key),
                 None => continue,
             }
         }
+    }
+
+    fn handle_key(&mut self, key: Key) {
+        match key {
+            Key::Code(_) => return,
+            Key::Char(ic) => {
+                match ic {
+                    58 => {
+                        self.handle_prompt(58);
+                    },
+                    ic => {
+                        // this is just for debugging
+                        ui::addstr(&ic.to_string());
+                        ui::addstr("|");
+                    },
+                }
+            },
+        }
+    }
+
+    fn handle_prompt(&mut self, ic: u32) {
+        let y = ui::getcury();
+        let x = ui::getcurx();
+
+        let text = self.prompt.run(ic);
+
+        match text {
+            Some(text) => {
+                let command = Command::parse(&text);
+
+                match command {
+                    Ok(command) => {
+                        match command {
+                            Command::Quit => self.exit(),
+                        }
+                    },
+                    Err(err) => {
+                        self.prompt.display_error(&error_message(err));
+                    }
+                }
+            }
+            None => return,
+        }
+
+        ui::mv(y,x);
+    }
+
+    fn exit(&mut self) {
+        self.running = false;
     }
 }
