@@ -1,27 +1,9 @@
-extern crate ncurses;
+extern crate king;
 
-use ncurses::*;
-
-fn init() {
-    initscr();
-    keypad(stdscr(), true);
-    noecho();
-}
-
-fn finish() {
-    endwin();
-}
+use king::editor::Editor;
 
 fn main() {
-    init();
+    let editor = Editor::new();
 
-    loop {
-        let ch = getch();
-        match ch {
-            113 => break,
-            _ => continue,
-        }
-    }
-
-    finish();
+    editor.run();
 }
