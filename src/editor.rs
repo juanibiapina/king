@@ -1,6 +1,8 @@
 use ui;
 use key::Key;
 use prompt::Prompt;
+use command::Command;
+use error::error_message;
 
 pub struct Editor {
     prompt: Prompt,
@@ -32,15 +34,23 @@ impl Editor {
                             let y = ui::getcury();
                             let x = ui::getcurx();
 
-                            let command = self.prompt.run(58);
+                            let text = self.prompt.run(58);
 
                             ui::mv(y,x);
 
-                            match command {
+                            match text {
                                 Some(text) => {
-                                    match text.as_str() {
-                                        "quit" => break,
-                                        _ => continue,
+                                    let command = Command::parse(&text);
+
+                                    match command {
+                                        Ok(command) => {
+                                            match command {
+                                                Command::Quit => break,
+                                            }
+                                        },
+                                        Err(err) => {
+                                            self.prompt.display_error(&error_message(err));
+                                        }
                                     }
                                 }
                                 None => continue,

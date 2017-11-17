@@ -17,6 +17,8 @@ impl Prompt {
     }
 
     pub fn run(&mut self, starting_char: u32) -> Option<String> {
+        self.clear();
+
         ui::mvaddch(self.y, 0, starting_char);
 
         loop {
@@ -49,5 +51,11 @@ impl Prompt {
 
         ui::mv(self.y, 0);
         ui::clrtoeol();
+    }
+
+    pub fn display_error(&mut self, text: &str) {
+        self.clear();
+
+        ui::addstr(text);
     }
 }
