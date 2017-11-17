@@ -44,11 +44,7 @@ impl Editor {
                     58 => {
                         self.handle_prompt(58);
                     },
-                    ic => {
-                        // this is just for debugging
-                        ui::addstr(&ic.to_string());
-                        ui::addstr("|");
-                    },
+                    _ => return,
                 }
             },
         }
