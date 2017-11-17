@@ -3,7 +3,9 @@ extern crate king;
 use king::editor::Editor;
 
 fn main() {
-    let editor = Editor::new();
+    let mut editor = Editor::init();
 
     editor.run();
+
+    editor.finish();
 }

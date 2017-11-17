@@ -1,16 +1,27 @@
 use ui;
 use key::Key;
+use prompt::Prompt;
 
-pub struct Editor;
+pub struct Editor {
+    prompt: Prompt,
+}
 
 impl Editor {
-    pub fn new() -> Editor {
-        Editor
-    }
-
-    pub fn run(&self) {
+    pub fn init() -> Editor {
         ui::init();
 
+        let max_y = ui::getmaxy();
+
+        Editor {
+            prompt: Prompt::new(max_y - 1),
+        }
+    }
+
+    pub fn finish(&self) {
+        ui::finish();
+    }
+
+    pub fn run(&mut self) {
         loop {
             let key = ui::get_key();
             match key {
@@ -18,13 +29,26 @@ impl Editor {
                 Some(Key::Char(ic)) => {
                     match ic {
                         113 => break,
-                        _ => continue,
+                        58 => {
+                            let y = ui::getcury();
+                            let x = ui::getcurx();
+
+                            let command = self.prompt.run(58);
+
+                            ui::mv(y,x);
+
+                            match command {
+                                Some(text) => ui::addstr(&text),
+                                None => continue,
+                            }
+                        },
+                        ic => {
+                            ui::addstr(&ic.to_string())
+                        },
                     }
                 },
                 None => continue,
             }
         }
-
-        ui::finish();
     }
 }
