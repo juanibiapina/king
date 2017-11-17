@@ -25,7 +25,7 @@ impl Prompt {
                 Some(Key::Code(_)) => continue,
                 Some(Key::Char(ic)) => {
                     match ic {
-                        10 => {
+                        13 => {
                             let text = self.text.clone();
                             self.clear();
                             return text;

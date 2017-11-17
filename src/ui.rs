@@ -8,6 +8,7 @@ pub fn init() {
     nc::initscr();
     nc::keypad(nc::stdscr(), true);
     nc::noecho();
+    nc::nonl();
 }
 
 pub fn finish() {
