@@ -1,22 +1,18 @@
-use ui::Ui;
+use ui;
 use key::Key;
 
-pub struct Editor {
-    ui: Ui,
-}
+pub struct Editor;
 
 impl Editor {
     pub fn new() -> Editor {
-        Editor {
-            ui: Ui::new(),
-        }
+        Editor
     }
 
     pub fn run(&self) {
-        self.ui.init();
+        ui::init();
 
         loop {
-            let key = self.ui.wget_wch();
+            let key = ui::get_key();
             match key {
                 Some(Key::Code(_)) => continue,
                 Some(Key::Char(ic)) => {
@@ -29,6 +25,6 @@ impl Editor {
             }
         }
 
-        self.ui.finish();
+        ui::finish();
     }
 }
