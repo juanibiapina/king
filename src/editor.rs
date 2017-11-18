@@ -61,6 +61,7 @@ impl Editor {
 
     fn render(&self) {
         self.window.render();
+        ui::doupdate();
     }
 
     fn handle_key(&mut self, key: Key) -> Result<()> {

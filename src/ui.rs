@@ -71,10 +71,14 @@ pub fn newwin(lines: i32, cols: i32, y: i32, x: i32) -> nc::WINDOW {
     nc::newwin(lines, cols, y, x)
 }
 
-pub fn wrefresh(w: nc::WINDOW) {
-    nc::wrefresh(w);
+pub fn wnoutrefresh(w: nc::WINDOW) {
+    nc::wnoutrefresh(w);
 }
 
 pub fn werase(w: nc::WINDOW) {
     nc::werase(w);
+}
+
+pub fn doupdate() {
+    nc::doupdate();
 }

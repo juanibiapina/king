@@ -32,7 +32,7 @@ impl Window {
         ui::wmove(self.nwindow, 0, 0);
         ui::waddstr(self.nwindow, &self.buffer.borrow().contents);
         ui::mv(0, 0);
-        ui::wrefresh(self.nwindow);
+        ui::wnoutrefresh(self.nwindow);
     }
 
     pub fn get_buffer(&self) -> Rc<RefCell<Buffer>> {
