@@ -30,7 +30,21 @@ impl Window {
     pub fn render(&self) {
         ui::werase(self.nwindow);
         ui::wmove(self.nwindow, 0, 0);
-        ui::waddstr(self.nwindow, &self.buffer.borrow().contents);
+
+        let max_y = ui::wgetmaxy(self.nwindow);
+        let max_x = ui::wgetmaxx(self.nwindow);
+
+        let mut current_line = 0;
+        for line in &self.buffer.borrow().contents {
+            ui::waddnstr(self.nwindow, line, max_x);
+
+            current_line += 1;
+            if current_line == max_y {
+                break;
+            }
+            ui::wmove(self.nwindow, current_line, 0);
+        }
+
         ui::wmove(self.nwindow, 0, 0);
         ui::wnoutrefresh(self.nwindow);
     }

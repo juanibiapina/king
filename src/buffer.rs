@@ -1,16 +1,16 @@
 use std::fs::File;
-use std::io::{Read, ErrorKind};
+use std::io::{BufRead, BufReader, ErrorKind};
 
 use error::{Error, Result};
 
 pub struct Buffer {
-    pub contents: String,
+    pub contents: Vec<String>,
 }
 
 impl Buffer {
     pub fn new() -> Buffer {
         Buffer {
-            contents: String::new(),
+            contents: Vec::new(),
         }
     }
 
@@ -19,7 +19,7 @@ impl Buffer {
     }
 
     pub fn load(&mut self, filename: &str) -> Result<()> {
-        let mut file = match File::open(filename) {
+        let file = match File::open(filename) {
             Ok(file) => file,
             Err(err) => {
                 match err.kind() {
@@ -29,9 +29,13 @@ impl Buffer {
             },
         };
 
-        match file.read_to_string(&mut self.contents) {
-            Ok(_) => Ok(()),
-            Err(err) => Err(Error::IoError(err)),
-        }
+        let reader = BufReader::new(file);
+
+        self.contents = match reader.lines().collect() {
+            Ok(lines) => lines,
+            Err(err) => return Err(Error::IoError(err)),
+        };
+
+        Ok(())
     }
 }
