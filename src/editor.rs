@@ -112,6 +112,7 @@ impl Editor {
             Key::Char(ic) => {
                 match ic {
                     13 => self.finish_prompt()?,
+                    27 => self.cancel_prompt(),
                     127 => prompt::delete_char(self),
                     ic => self.prompt.add_char(ic),
                 }
@@ -152,6 +153,11 @@ impl Editor {
         };
 
         Ok(())
+    }
+
+    fn cancel_prompt(&mut self) {
+        self.switch_to_normal();
+        self.prompt.clear();
     }
 
     fn switch_to_prompt(&mut self, ic: u32) {
