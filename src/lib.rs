@@ -1,3 +1,4 @@
+mod mode;
 mod ui;
 mod prompt;
 mod key;

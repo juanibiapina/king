@@ -5,11 +5,26 @@ use std::char;
 use self::ncurses as nc;
 
 use ui;
+use editor::Editor;
+use mode::Mode;
 
 pub struct Prompt {
-    text: Option<String>,
+    text: String,
     error: Option<String>,
     nwindow: nc::WINDOW,
+}
+
+pub fn delete_char(editor: &mut Editor) {
+    editor.prompt.text.pop();
+
+    if editor.prompt.text.is_empty() {
+        end(editor);
+    }
+}
+
+fn end(editor: &mut Editor) {
+    editor.mode = Mode::Normal;
+    editor.prompt.clear();
 }
 
 impl Prompt {
@@ -18,17 +33,14 @@ impl Prompt {
         let nwindow = ui::newwin(1, max_x, y, 0);
 
         Prompt {
-            text: None,
+            text: "".to_owned(),
             error: None,
             nwindow: nwindow,
         }
     }
 
     pub fn move_cursor(&self) {
-        match self.text {
-            Some(ref text) => ui::wmove(self.nwindow, 0, text.len() as i32),
-            None => ui::wmove(self.nwindow, 0, 0),
-        }
+        ui::wmove(self.nwindow, 0, self.text.len() as i32);
         ui::wnoutrefresh(self.nwindow);
     }
 
@@ -37,12 +49,12 @@ impl Prompt {
         self.add_char(starting_char);
     }
 
-    pub fn get_text(&self) -> Option<String> {
+    pub fn get_text(&self) -> String {
         self.text.clone()
     }
 
     pub fn clear(&mut self) {
-        self.text = None;
+        self.text = "".to_owned();
         self.error = None;
     }
 
@@ -53,10 +65,7 @@ impl Prompt {
         match self.error {
             Some(ref text) => ui::waddnstr(self.nwindow, text, -1),
             None => {
-                match self.text {
-                    Some(ref text) => ui::waddnstr(self.nwindow, text, -1),
-                    None => {},
-                }
+                ui::waddnstr(self.nwindow, &self.text, -1)
             },
         }
 
@@ -68,9 +77,6 @@ impl Prompt {
     }
 
     pub fn add_char(&mut self, ic: u32) {
-        match self.text {
-            Some(ref mut text) => text.push(char::from_u32(ic).unwrap()),
-            None => self.text = Some(char::from_u32(ic).unwrap().to_string()),
-        }
+        self.text.push(char::from_u32(ic).unwrap());
     }
 }

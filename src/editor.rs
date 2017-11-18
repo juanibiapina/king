@@ -1,21 +1,17 @@
 use error::Result;
 use ui;
 use key::Key;
-use prompt::Prompt;
+use prompt::{self, Prompt};
 use command::Command;
 use error::error_message;
 use buffer::{create_buffer, SharedBuffer};
+use mode::Mode;
 use window::Window;
 
-enum Mode {
-    Normal,
-    Prompt,
-}
-
 pub struct Editor {
-    mode: Mode,
+    pub mode: Mode,
     running: bool,
-    prompt: Prompt,
+    pub prompt: Prompt,
     window: Window,
     buffers: Vec<SharedBuffer>,
 }
@@ -105,6 +101,7 @@ impl Editor {
             Key::Char(ic) => {
                 match ic {
                     13 => self.finish_prompt()?,
+                    127 => prompt::delete_char(self),
                     ic => self.prompt.add_char(ic),
                 }
             },
@@ -119,16 +116,15 @@ impl Editor {
         let text = self.prompt.get_text();
         self.prompt.clear();
 
-        match text {
-            Some(text) => {
-                let command = Command::parse(&text)?;
+        if text.is_empty() {
+            return Ok(());
+        }
 
-                match command {
-                    Command::Quit => self.exit()?,
-                    Command::Edit(filename) => self.edit(&filename)?,
-                };
-            }
-            None => {},
+        let command = Command::parse(&text)?;
+
+        match command {
+            Command::Quit => self.exit()?,
+            Command::Edit(filename) => self.edit(&filename)?,
         };
 
         Ok(())
