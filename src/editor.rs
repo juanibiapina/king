@@ -55,9 +55,7 @@ impl Editor {
     }
 
     fn render(&self) {
-        let buffer = self.window.get_buffer();
-        ui::mv(0, 0);
-        ui::addstr(&buffer.borrow().contents);
+        self.window.render();
     }
 
     fn handle_key(&mut self, key: Key) -> Result<()> {
