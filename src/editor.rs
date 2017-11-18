@@ -67,6 +67,7 @@ impl Editor {
     fn render(&self) {
         self.window.render();
         self.prompt.render();
+
         ui::doupdate();
     }
 

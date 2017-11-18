@@ -6,13 +6,13 @@ use key::Key;
 
 pub fn init() {
     nc::initscr();
-    nc::keypad(nc::stdscr(), true);
-    nc::noecho();
-    nc::nonl();
+    check(nc::keypad(nc::stdscr(), true));
+    check(nc::noecho());
+    check(nc::nonl());
 }
 
 pub fn finish() {
-    nc::endwin();
+    check(nc::endwin());
 }
 
 pub fn get_key() ->  Option<Key> {
@@ -24,11 +24,11 @@ pub fn get_key() ->  Option<Key> {
 }
 
 pub fn waddstr(w: nc::WINDOW, s: &str) {
-    nc::waddstr(w, s);
+    check(nc::waddstr(w, s));
 }
 
 pub fn waddnstr(w: nc::WINDOW, s: &str, n: i32) {
-    nc::waddnstr(w, s, n);
+    check(nc::waddnstr(w, s, n));
 }
 
 pub fn getmaxy() -> i32 {
@@ -48,11 +48,7 @@ pub fn wgetmaxx(w: nc::WINDOW) -> i32 {
 }
 
 pub fn wmove(w: nc::WINDOW, y: i32, x: i32) {
-    nc::wmove(w, y, x);
-}
-
-pub fn mv(y: i32, x: i32) {
-    nc::mv(y, x);
+    check(nc::wmove(w, y, x));
 }
 
 pub fn newwin(lines: i32, cols: i32, y: i32, x: i32) -> nc::WINDOW {
@@ -60,13 +56,19 @@ pub fn newwin(lines: i32, cols: i32, y: i32, x: i32) -> nc::WINDOW {
 }
 
 pub fn wnoutrefresh(w: nc::WINDOW) {
-    nc::wnoutrefresh(w);
+    check(nc::wnoutrefresh(w));
 }
 
 pub fn werase(w: nc::WINDOW) {
-    nc::werase(w);
+    check(nc::werase(w));
 }
 
 pub fn doupdate() {
-    nc::doupdate();
+    check(nc::doupdate());
+}
+
+pub fn check(result: i32) {
+    if result == nc::ERR {
+        panic!("error");
+    }
 }
