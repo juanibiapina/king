@@ -27,12 +27,16 @@ impl Editor {
         let buffer = Rc::new(RefCell::new(Buffer::new()));
         let window = Window::new(max_y - 1, max_x, buffer.clone());
 
-        Editor {
+        let editor = Editor {
             prompt: Prompt::new(max_y - 1),
             window: window,
             running: true,
             buffers: vec![buffer.clone()],
-        }
+        };
+
+        editor.render();
+
+        return editor;
     }
 
     pub fn finish(&self) {

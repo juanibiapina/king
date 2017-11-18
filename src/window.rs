@@ -28,6 +28,7 @@ impl Window {
     }
 
     pub fn render(&self) {
+        ui::werase(self.nwindow);
         ui::wmove(self.nwindow, 0, 0);
         ui::waddstr(self.nwindow, &self.buffer.borrow().contents);
         ui::mv(0, 0);
