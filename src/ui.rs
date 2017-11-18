@@ -27,6 +27,10 @@ pub fn addstr(s: &str) {
     nc::addstr(s);
 }
 
+pub fn waddstr(w: nc::WINDOW, s: &str) {
+    nc::waddstr(w, s);
+}
+
 pub fn waddnstr(w: nc::WINDOW, s: &str, n: i32) {
     nc::waddnstr(w, s, n);
 }
