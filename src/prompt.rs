@@ -24,6 +24,14 @@ impl Prompt {
         }
     }
 
+    pub fn move_cursor(&self) {
+        match self.text {
+            Some(ref text) => ui::wmove(self.nwindow, 0, text.len() as i32),
+            None => ui::wmove(self.nwindow, 0, 0),
+        }
+        ui::wnoutrefresh(self.nwindow);
+    }
+
     pub fn start(&mut self, starting_char: u32) {
         self.clear();
         self.add_char(starting_char);

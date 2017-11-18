@@ -68,6 +68,15 @@ impl Editor {
         self.window.render();
         self.prompt.render();
 
+        match self.mode {
+            Mode::Normal => {
+                self.window.move_cursor();
+            },
+            Mode::Prompt => {
+                self.prompt.move_cursor();
+            },
+        }
+
         ui::doupdate();
     }
 

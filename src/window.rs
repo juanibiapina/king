@@ -8,6 +8,8 @@ use buffer::SharedBuffer;
 pub struct Window {
     buffer: SharedBuffer,
     nwindow: nc::WINDOW,
+    cur_y: i32,
+    cur_x: i32,
 }
 
 impl Window {
@@ -17,11 +19,18 @@ impl Window {
         Window {
             buffer: buffer,
             nwindow: nwindow,
+            cur_y: 0,
+            cur_x: 0,
         }
     }
 
     pub fn is_fresh(&self) -> bool {
         self.buffer.borrow().is_fresh()
+    }
+
+    pub fn move_cursor(&self) {
+        ui::wmove(self.nwindow, self.cur_y, self.cur_x);
+        ui::wnoutrefresh(self.nwindow);
     }
 
     pub fn render(&self) {
