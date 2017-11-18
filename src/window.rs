@@ -76,10 +76,8 @@ impl Window {
         }
 
         while current_line < max_y {
-            if current_line != 0 {
-                ui::wmove(self.nwindow, current_line, 0);
-                ui::waddstr(self.nwindow, "~");
-            }
+            ui::wmove(self.nwindow, current_line, 0);
+            ui::waddstr(self.nwindow, "~");
             current_line += 1;
         }
 
