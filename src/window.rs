@@ -33,19 +33,33 @@ impl Window {
     }
 
     pub fn move_cursor(&mut self, offset_y: i32, offset_x: i32) {
+        let contents = &self.buffer.borrow().contents;
+        let contents_len = contents.len() as i32;
+
         self.cur_y += offset_y;
-        self.cur_x += offset_x;
+
+        if self.cur_y >= contents_len {
+            self.cur_y = contents_len - 1;
+        }
 
         if self.cur_y < 0 {
             self.cur_y = 0;
         }
 
-        if self.cur_x < 0 {
-            self.cur_x = 0;
-        }
-
         if self.cur_y >= self.height {
             self.cur_y = self.height - 1;
+        }
+
+        let line_len = contents[self.cur_y as usize].len() as i32;
+
+        self.cur_x += offset_x;
+
+        if self.cur_x >= line_len {
+            self.cur_x = line_len - 1;
+        }
+
+        if self.cur_x < 0 {
+            self.cur_x = 0;
         }
 
         if self.cur_x >= self.width {
