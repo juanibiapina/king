@@ -89,6 +89,10 @@ impl Editor {
             Key::Char(ic) => {
                 match ic {
                     58 => self.switch_to_prompt(58),
+                    104 => self.window.move_cursor(0, -1),
+                    106 => self.window.move_cursor(1, 0),
+                    107 => self.window.move_cursor(-1, 0),
+                    108 => self.window.move_cursor(0, 1),
                     _ => {},
                 };
             },

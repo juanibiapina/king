@@ -10,6 +10,8 @@ pub struct Window {
     nwindow: nc::WINDOW,
     cur_y: i32,
     cur_x: i32,
+    height: i32,
+    width: i32,
 }
 
 impl Window {
@@ -21,11 +23,34 @@ impl Window {
             nwindow: nwindow,
             cur_y: 0,
             cur_x: 0,
+            height: height,
+            width: width,
         }
     }
 
     pub fn is_fresh(&self) -> bool {
         self.buffer.borrow().is_fresh()
+    }
+
+    pub fn move_cursor(&mut self, offset_y: i32, offset_x: i32) {
+        self.cur_y += offset_y;
+        self.cur_x += offset_x;
+
+        if self.cur_y < 0 {
+            self.cur_y = 0;
+        }
+
+        if self.cur_x < 0 {
+            self.cur_x = 0;
+        }
+
+        if self.cur_y >= self.height {
+            self.cur_y = self.height - 1;
+        }
+
+        if self.cur_x >= self.width {
+            self.cur_x = self.width - 1;
+        }
     }
 
     pub fn render_cursor(&self) {
