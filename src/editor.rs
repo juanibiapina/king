@@ -82,55 +82,60 @@ impl Editor {
 
     fn handle_key(&mut self, key: Key) -> Result<()> {
         match self.mode {
-            Mode::Normal => {
-                match key {
-                    Key::Code(_) => Ok(()),
-                    Key::Char(ic) => {
-                        match ic {
-                            58 => self.switch_to_prompt(58),
-                            _ => Ok(()),
-                        }
-                    },
-                }
-            },
-            Mode::Prompt => {
-                match key {
-                    Key::Code(_) => Ok(()),
-                    Key::Char(ic) => {
-                        match ic {
-                            13 => {
-                                let text = self.prompt.get_text();
-                                self.prompt.clear();
-                                match text {
-                                    Some(text) => {
-                                        let command = Command::parse(&text);
+            Mode::Normal => self.handle_key_normal(key),
+            Mode::Prompt => self.handle_key_prompt(key),
+        }
+    }
 
-                                        match command {
-                                            Ok(command) => {
-                                                match command {
-                                                    Command::Quit => self.exit()?,
-                                                    Command::Edit(filename) => self.edit(&filename)?,
-                                                };
-                                            },
-                                            Err(err) => {
-                                                self.prompt.display_error(&error_message(err));
-                                            }
-                                        }
-                                    }
-                                    None => {},
-                                };
-
-                                self.switch_to_normal()
-                            },
-                            ic => {
-                                self.prompt.add_char(ic);
-                                Ok(())
-                            },
-                        }
-                    },
+    fn handle_key_normal(&mut self, key: Key) -> Result<()> {
+        match key {
+            Key::Code(_) => Ok(()),
+            Key::Char(ic) => {
+                match ic {
+                    58 => self.switch_to_prompt(58),
+                    _ => Ok(()),
                 }
             },
         }
+    }
+
+    fn handle_key_prompt(&mut self, key: Key) -> Result<()> {
+        match key {
+            Key::Code(_) => {},
+            Key::Char(ic) => {
+                match ic {
+                    13 => self.finish_prompt()?,
+                    ic => self.prompt.add_char(ic),
+                }
+            },
+        };
+
+        Ok(())
+    }
+
+    fn finish_prompt(&mut self) -> Result<()> {
+        let text = self.prompt.get_text();
+        self.prompt.clear();
+        match text {
+            Some(text) => {
+                let command = Command::parse(&text);
+
+                match command {
+                    Ok(command) => {
+                        match command {
+                            Command::Quit => self.exit()?,
+                            Command::Edit(filename) => self.edit(&filename)?,
+                        };
+                    },
+                    Err(err) => {
+                        self.prompt.display_error(&error_message(err));
+                    }
+                }
+            }
+            None => {},
+        };
+
+        self.switch_to_normal()
     }
 
     fn switch_to_prompt(&mut self, ic: u32) -> Result<()> {
