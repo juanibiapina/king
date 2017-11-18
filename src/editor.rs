@@ -3,10 +3,13 @@ use key::Key;
 use prompt::Prompt;
 use command::Command;
 use error::error_message;
+use buffer::Buffer;
 
 pub struct Editor {
-    prompt: Prompt,
     running: bool,
+    prompt: Prompt,
+    buffers: Vec<Buffer>,
+    active_buffer: usize,
 }
 
 impl Editor {
@@ -18,6 +21,8 @@ impl Editor {
         Editor {
             prompt: Prompt::new(max_y - 1),
             running: true,
+            buffers: vec![Buffer::new()],
+            active_buffer: 0,
         }
     }
 
@@ -33,7 +38,14 @@ impl Editor {
                 Some(key) => self.handle_key(key),
                 None => continue,
             }
+
+            self.render();
         }
+    }
+
+    fn render(&self) {
+        ui::mv(0, 0);
+        ui::addstr(&self.buffers[self.active_buffer].contents);
     }
 
     fn handle_key(&mut self, key: Key) {
@@ -64,6 +76,7 @@ impl Editor {
                     Ok(command) => {
                         match command {
                             Command::Quit => self.exit(),
+                            Command::Edit(filename) => self.edit(&filename),
                         }
                     },
                     Err(err) => {
@@ -79,5 +92,14 @@ impl Editor {
 
     fn exit(&mut self) {
         self.running = false;
+    }
+
+    fn edit(&mut self, filename: &str) {
+        if !self.buffers[self.active_buffer].is_empty() {
+            self.buffers.push(Buffer::new());
+            self.active_buffer = self.buffers.len() - 1;
+        }
+
+        self.buffers[self.active_buffer].load(filename);
     }
 }
