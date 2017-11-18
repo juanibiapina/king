@@ -21,7 +21,7 @@ impl Window {
     }
 
     pub fn is_fresh(&self) -> bool {
-        self.buffer.borrow().is_empty()
+        self.buffer.borrow().is_fresh()
     }
 
     pub fn render(&self) {

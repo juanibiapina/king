@@ -8,6 +8,7 @@ use error::{Error, Result};
 pub type SharedBuffer = Rc<RefCell<Buffer>>;
 
 pub struct Buffer {
+    name: Option<String>,
     pub contents: Vec<String>,
 }
 
@@ -18,32 +19,40 @@ pub fn create_buffer() -> SharedBuffer {
 impl Buffer {
     pub fn new() -> Buffer {
         Buffer {
+            name: None,
             contents: Vec::new(),
         }
     }
 
-    pub fn is_empty(&self) -> bool {
-        self.contents.is_empty()
+    pub fn is_fresh(&self) -> bool {
+        self.name.is_none() && self.contents.is_empty()
     }
 
     pub fn load(&mut self, filename: &str) -> Result<()> {
-        let file = match File::open(filename) {
-            Ok(file) => file,
-            Err(err) => {
-                match err.kind() {
-                    ErrorKind::NotFound => return Err(Error::FileNotFound(filename.to_owned())),
-                    _ => return Err(Error::IoError(err)),
+        match File::open(filename) {
+            Ok(file) => {
+                let reader = BufReader::new(file);
+                match reader.lines().collect() {
+                    Ok(lines) => {
+                        self.name = Some(filename.to_owned());
+                        self.contents = lines;
+
+                        Ok(())
+                    },
+                    Err(err) => Err(Error::IoError(err)),
                 }
             },
-        };
+            Err(err) => {
+                match err.kind() {
+                    ErrorKind::NotFound => {
+                        self.name = Some(filename.to_owned());
+                        self.contents = Vec::new();
 
-        let reader = BufReader::new(file);
-
-        self.contents = match reader.lines().collect() {
-            Ok(lines) => lines,
-            Err(err) => return Err(Error::IoError(err)),
-        };
-
-        Ok(())
+                        Ok(())
+                    },
+                    _ => Err(Error::IoError(err)),
+                }
+            },
+        }
     }
 }
