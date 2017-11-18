@@ -1,6 +1,7 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
+use error::Result;
 use ui;
 use key::Key;
 use prompt::Prompt;
@@ -42,9 +43,12 @@ impl Editor {
             let key = ui::get_key();
 
             match key {
-                Some(key) => self.handle_key(key),
-                None => continue,
-            }
+                Some(key) => match self.handle_key(key) {
+                    Ok(()) => {},
+                    Err(err) => self.prompt.display_error(&error_message(err)),
+                },
+                None => {},
+            };
 
             self.render();
         }
@@ -56,21 +60,19 @@ impl Editor {
         ui::addstr(&buffer.borrow().contents);
     }
 
-    fn handle_key(&mut self, key: Key) {
+    fn handle_key(&mut self, key: Key) -> Result<()> {
         match key {
-            Key::Code(_) => return,
+            Key::Code(_) => Ok(()),
             Key::Char(ic) => {
                 match ic {
-                    58 => {
-                        self.handle_prompt(58);
-                    },
-                    _ => return,
+                    58 => self.handle_prompt(58),
+                    _ => Ok(()),
                 }
             },
         }
     }
 
-    fn handle_prompt(&mut self, ic: u32) {
+    fn handle_prompt(&mut self, ic: u32) -> Result<()> {
         let y = ui::getcury();
         let x = ui::getcurx();
 
@@ -83,26 +85,30 @@ impl Editor {
                 match command {
                     Ok(command) => {
                         match command {
-                            Command::Quit => self.exit(),
-                            Command::Edit(filename) => self.edit(&filename),
-                        }
+                            Command::Quit => self.exit()?,
+                            Command::Edit(filename) => self.edit(&filename)?,
+                        };
                     },
                     Err(err) => {
                         self.prompt.display_error(&error_message(err));
                     }
                 }
             }
-            None => return,
+            None => return Ok(()),
         }
 
         ui::mv(y,x);
+
+        Ok(())
     }
 
-    fn exit(&mut self) {
+    fn exit(&mut self) -> Result<()> {
         self.running = false;
+
+        Ok(())
     }
 
-    fn edit(&mut self, filename: &str) {
+    fn edit(&mut self, filename: &str) -> Result<()> {
         let buffer;
 
         if self.window.is_fresh() {
@@ -113,6 +119,8 @@ impl Editor {
             self.window.set_buffer(buffer.clone());
         }
 
-        buffer.borrow_mut().load(filename);
+        buffer.borrow_mut().load(filename)?;
+
+        Ok(())
     }
 }

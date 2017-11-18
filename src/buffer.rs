@@ -1,5 +1,7 @@
 use std::fs::File;
-use std::io::Read;
+use std::io::{Read, ErrorKind};
+
+use error::{Error, Result};
 
 pub struct Buffer {
     pub contents: String,
@@ -16,8 +18,20 @@ impl Buffer {
         self.contents.is_empty()
     }
 
-    pub fn load(&mut self, filename: &str) {
-        let mut file = File::open(filename).unwrap();
-        file.read_to_string(&mut self.contents).unwrap();
+    pub fn load(&mut self, filename: &str) -> Result<()> {
+        let mut file = match File::open(filename) {
+            Ok(file) => file,
+            Err(err) => {
+                match err.kind() {
+                    ErrorKind::NotFound => return Err(Error::FileNotFound(filename.to_owned())),
+                    _ => return Err(Error::IoError(err)),
+                }
+            },
+        };
+
+        match file.read_to_string(&mut self.contents) {
+            Ok(_) => Ok(()),
+            Err(err) => Err(Error::IoError(err)),
+        }
     }
 }
