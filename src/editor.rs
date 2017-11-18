@@ -66,10 +66,10 @@ impl Editor {
 
         match self.mode {
             Mode::Normal => {
-                self.window.move_cursor();
+                self.window.render_cursor();
             },
             Mode::Prompt => {
-                self.prompt.move_cursor();
+                self.prompt.render_cursor();
             },
         }
 

@@ -28,7 +28,7 @@ impl Window {
         self.buffer.borrow().is_fresh()
     }
 
-    pub fn move_cursor(&self) {
+    pub fn render_cursor(&self) {
         ui::wmove(self.nwindow, self.cur_y, self.cur_x);
         ui::wnoutrefresh(self.nwindow);
     }

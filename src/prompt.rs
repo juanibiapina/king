@@ -41,7 +41,7 @@ impl Prompt {
         }
     }
 
-    pub fn move_cursor(&self) {
+    pub fn render_cursor(&self) {
         ui::wmove(self.nwindow, 0, self.text.len() as i32);
         ui::wnoutrefresh(self.nwindow);
     }
