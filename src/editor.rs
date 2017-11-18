@@ -85,14 +85,16 @@ impl Editor {
 
     fn handle_key_normal(&mut self, key: Key) -> Result<()> {
         match key {
-            Key::Code(_) => Ok(()),
+            Key::Code(_) => {},
             Key::Char(ic) => {
                 match ic {
                     58 => self.switch_to_prompt(58),
-                    _ => Ok(()),
-                }
+                    _ => {},
+                };
             },
-        }
+        };
+
+        Ok(())
     }
 
     fn handle_key_prompt(&mut self, key: Key) -> Result<()> {
@@ -111,7 +113,7 @@ impl Editor {
     }
 
     fn finish_prompt(&mut self) -> Result<()> {
-        self.switch_to_normal()?;
+        self.switch_to_normal();
 
         let text = self.prompt.get_text();
         self.prompt.clear();
@@ -130,18 +132,13 @@ impl Editor {
         Ok(())
     }
 
-    fn switch_to_prompt(&mut self, ic: u32) -> Result<()> {
+    fn switch_to_prompt(&mut self, ic: u32) {
         self.mode = Mode::Prompt;
-
         self.prompt.start(ic);
-
-        Ok(())
     }
 
-    fn switch_to_normal(&mut self) -> Result<()> {
+    fn switch_to_normal(&mut self) {
         self.mode = Mode::Normal;
-
-        Ok(())
     }
 
     fn exit(&mut self) -> Result<()> {
