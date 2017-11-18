@@ -4,5 +4,6 @@ mod key;
 mod command;
 mod error;
 mod buffer;
+mod window;
 
 pub mod editor;

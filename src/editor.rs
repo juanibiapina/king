@@ -1,15 +1,19 @@
+use std::rc::Rc;
+use std::cell::RefCell;
+
 use ui;
 use key::Key;
 use prompt::Prompt;
 use command::Command;
 use error::error_message;
 use buffer::Buffer;
+use window::Window;
 
 pub struct Editor {
     running: bool,
     prompt: Prompt,
-    buffers: Vec<Buffer>,
-    active_buffer: usize,
+    window: Window,
+    buffers: Vec<Rc<RefCell<Buffer>>>,
 }
 
 impl Editor {
@@ -18,11 +22,14 @@ impl Editor {
 
         let max_y = ui::getmaxy();
 
+        let buffer = Rc::new(RefCell::new(Buffer::new()));
+        let window = Window::new(buffer.clone());
+
         Editor {
             prompt: Prompt::new(max_y - 1),
+            window: window,
             running: true,
-            buffers: vec![Buffer::new()],
-            active_buffer: 0,
+            buffers: vec![buffer.clone()],
         }
     }
 
@@ -44,8 +51,9 @@ impl Editor {
     }
 
     fn render(&self) {
+        let buffer = self.window.get_buffer();
         ui::mv(0, 0);
-        ui::addstr(&self.buffers[self.active_buffer].contents);
+        ui::addstr(&buffer.borrow().contents);
     }
 
     fn handle_key(&mut self, key: Key) {
@@ -95,11 +103,16 @@ impl Editor {
     }
 
     fn edit(&mut self, filename: &str) {
-        if !self.buffers[self.active_buffer].is_empty() {
-            self.buffers.push(Buffer::new());
-            self.active_buffer = self.buffers.len() - 1;
+        let buffer;
+
+        if self.window.is_fresh() {
+            buffer = self.window.get_buffer();
+        } else {
+            buffer = Rc::new(RefCell::new(Buffer::new()));
+            self.buffers.push(buffer.clone());
+            self.window.set_buffer(buffer.clone());
         }
 
-        self.buffers[self.active_buffer].load(filename);
+        buffer.borrow_mut().load(filename);
     }
 }
