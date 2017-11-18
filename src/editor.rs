@@ -1,20 +1,17 @@
-use std::rc::Rc;
-use std::cell::RefCell;
-
 use error::Result;
 use ui;
 use key::Key;
 use prompt::Prompt;
 use command::Command;
 use error::error_message;
-use buffer::Buffer;
+use buffer::{create_buffer, SharedBuffer};
 use window::Window;
 
 pub struct Editor {
     running: bool,
     prompt: Prompt,
     window: Window,
-    buffers: Vec<Rc<RefCell<Buffer>>>,
+    buffers: Vec<SharedBuffer>,
 }
 
 impl Editor {
@@ -24,7 +21,7 @@ impl Editor {
         let max_y = ui::getmaxy();
         let max_x = ui::getmaxx();
 
-        let buffer = Rc::new(RefCell::new(Buffer::new()));
+        let buffer = create_buffer();
         let window = Window::new(max_y - 1, max_x, buffer.clone());
 
         let editor = Editor {
@@ -118,7 +115,7 @@ impl Editor {
         if self.window.is_fresh() {
             buffer = self.window.get_buffer();
         } else {
-            buffer = Rc::new(RefCell::new(Buffer::new()));
+            buffer = create_buffer();
             self.buffers.push(buffer.clone());
             self.window.set_buffer(buffer.clone());
         }
