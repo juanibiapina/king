@@ -87,6 +87,10 @@ pub fn wnoutrefresh(w: nc::WINDOW) {
     nc::wnoutrefresh(w);
 }
 
+pub fn refresh() {
+    nc::refresh();
+}
+
 pub fn werase(w: nc::WINDOW) {
     nc::werase(w);
 }

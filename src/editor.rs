@@ -7,7 +7,13 @@ use error::error_message;
 use buffer::{create_buffer, SharedBuffer};
 use window::Window;
 
+enum Mode {
+    Normal,
+    Prompt,
+}
+
 pub struct Editor {
+    mode: Mode,
     running: bool,
     prompt: Prompt,
     window: Window,
@@ -25,6 +31,7 @@ impl Editor {
         let window = Window::new(max_y - 1, max_x, buffer.clone());
 
         let editor = Editor {
+            mode: Mode::Normal,
             prompt: Prompt::new(max_y - 1),
             window: window,
             running: true,
@@ -58,47 +65,74 @@ impl Editor {
 
     fn render(&self) {
         self.window.render();
+        self.prompt.render();
+        ui::refresh(); // until prompt becomes a window
         ui::doupdate();
     }
 
     fn handle_key(&mut self, key: Key) -> Result<()> {
-        match key {
-            Key::Code(_) => Ok(()),
-            Key::Char(ic) => {
-                match ic {
-                    58 => self.handle_prompt(58),
-                    _ => Ok(()),
+        match self.mode {
+            Mode::Normal => {
+                match key {
+                    Key::Code(_) => Ok(()),
+                    Key::Char(ic) => {
+                        match ic {
+                            58 => self.switch_to_prompt(58),
+                            _ => Ok(()),
+                        }
+                    },
+                }
+            },
+            Mode::Prompt => {
+                match key {
+                    Key::Code(_) => Ok(()),
+                    Key::Char(ic) => {
+                        match ic {
+                            13 => {
+                                let text = self.prompt.get_text();
+                                self.prompt.clear();
+                                match text {
+                                    Some(text) => {
+                                        let command = Command::parse(&text);
+
+                                        match command {
+                                            Ok(command) => {
+                                                match command {
+                                                    Command::Quit => self.exit()?,
+                                                    Command::Edit(filename) => self.edit(&filename)?,
+                                                };
+                                            },
+                                            Err(err) => {
+                                                self.prompt.display_error(&error_message(err));
+                                            }
+                                        }
+                                    }
+                                    None => {},
+                                };
+
+                                self.switch_to_normal()
+                            },
+                            ic => {
+                                self.prompt.add_char(ic);
+                                Ok(())
+                            },
+                        }
+                    },
                 }
             },
         }
     }
 
-    fn handle_prompt(&mut self, ic: u32) -> Result<()> {
-        let y = ui::getcury();
-        let x = ui::getcurx();
+    fn switch_to_prompt(&mut self, ic: u32) -> Result<()> {
+        self.mode = Mode::Prompt;
 
-        let text = self.prompt.run(ic);
+        self.prompt.start(ic);
 
-        match text {
-            Some(text) => {
-                let command = Command::parse(&text);
+        Ok(())
+    }
 
-                match command {
-                    Ok(command) => {
-                        match command {
-                            Command::Quit => self.exit()?,
-                            Command::Edit(filename) => self.edit(&filename)?,
-                        };
-                    },
-                    Err(err) => {
-                        self.prompt.display_error(&error_message(err));
-                    }
-                }
-            }
-            None => return Ok(()),
-        }
-
-        ui::mv(y,x);
+    fn switch_to_normal(&mut self) -> Result<()> {
+        self.mode = Mode::Normal;
 
         Ok(())
     }

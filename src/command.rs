@@ -10,8 +10,8 @@ impl Command {
         let words = text.split(" ").collect::<Vec<_>>();
 
         match words[0] {
-            "quit" => Ok(Command::Quit),
-            "edit" => Ok(Command::Edit(words[1].to_owned())),
+            ":quit" => Ok(Command::Quit),
+            ":edit" => Ok(Command::Edit(words[1].to_owned())),
             _ => Err(Error::CommandNotFound(text.to_owned())),
         }
     }
