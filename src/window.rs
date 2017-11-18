@@ -1,5 +1,7 @@
 extern crate ncurses;
 
+use std::char;
+
 use self::ncurses as nc;
 
 use ui;
@@ -32,11 +34,9 @@ impl Window {
         self.buffer.borrow().is_fresh()
     }
 
-    pub fn move_cursor(&mut self, offset_y: i32, offset_x: i32) {
+    fn adjust_cursor(&mut self) {
         let contents = &self.buffer.borrow().contents;
         let contents_len = contents.len() as i32;
-
-        self.cur_y += offset_y;
 
         if self.cur_y >= contents_len {
             self.cur_y = contents_len - 1;
@@ -52,8 +52,6 @@ impl Window {
 
         let line_len = contents[self.cur_y as usize].len() as i32;
 
-        self.cur_x += offset_x;
-
         if self.cur_x >= line_len {
             self.cur_x = line_len - 1;
         }
@@ -65,6 +63,13 @@ impl Window {
         if self.cur_x >= self.width {
             self.cur_x = self.width - 1;
         }
+    }
+
+    pub fn move_cursor(&mut self, offset_y: i32, offset_x: i32) {
+        self.cur_y += offset_y;
+        self.cur_x += offset_x;
+
+        self.adjust_cursor();
     }
 
     pub fn render_cursor(&self) {
@@ -104,5 +109,13 @@ impl Window {
 
     pub fn set_buffer(&mut self, buffer: SharedBuffer) {
         self.buffer = buffer;
+    }
+
+    pub fn add_char(&mut self, ic: u32) {
+        let current_line = &mut self.buffer.borrow_mut().contents[self.cur_y as usize];
+
+        current_line.insert(self.cur_x as usize, char::from_u32(ic).unwrap());
+
+        self.cur_x += 1;
     }
 }

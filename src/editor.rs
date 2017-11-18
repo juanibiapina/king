@@ -68,6 +68,9 @@ impl Editor {
             Mode::Normal => {
                 self.window.render_cursor();
             },
+            Mode::Insert => {
+                self.window.render_cursor();
+            },
             Mode::Prompt => {
                 self.prompt.render_cursor();
             },
@@ -79,6 +82,7 @@ impl Editor {
     fn handle_key(&mut self, key: Key) -> Result<()> {
         match self.mode {
             Mode::Normal => self.handle_key_normal(key),
+            Mode::Insert => self.handle_key_insert(key),
             Mode::Prompt => self.handle_key_prompt(key),
         }
     }
@@ -89,6 +93,7 @@ impl Editor {
             Key::Char(ic) => {
                 match ic {
                     58 => self.switch_to_prompt(58),
+                    105 => self.switch_to_insert(),
                     104 => self.window.move_cursor(0, -1),
                     106 => self.window.move_cursor(1, 0),
                     107 => self.window.move_cursor(-1, 0),
@@ -111,6 +116,19 @@ impl Editor {
                     ic => self.prompt.add_char(ic),
                 }
             },
+        };
+
+        Ok(())
+    }
+
+    fn handle_key_insert(&mut self, key: Key) -> Result<()> {
+        match key {
+            Key::Code(_) => {},
+            Key::Char(ic) =>
+                match ic {
+                    27 => self.switch_to_normal(),
+                    ic => self.window.add_char(ic),
+                }
         };
 
         Ok(())
@@ -139,6 +157,10 @@ impl Editor {
     fn switch_to_prompt(&mut self, ic: u32) {
         self.mode = Mode::Prompt;
         self.prompt.start(ic);
+    }
+
+    fn switch_to_insert(&mut self) {
+        self.mode = Mode::Insert;
     }
 
     fn switch_to_normal(&mut self) {
