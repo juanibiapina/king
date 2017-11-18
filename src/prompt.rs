@@ -11,6 +11,7 @@ use mode::Mode;
 pub struct Prompt {
     text: String,
     error: Option<String>,
+    message: Option<String>,
     nwindow: nc::WINDOW,
 }
 
@@ -35,6 +36,7 @@ impl Prompt {
         Prompt {
             text: "".to_owned(),
             error: None,
+            message: None,
             nwindow: nwindow,
         }
     }
@@ -55,6 +57,7 @@ impl Prompt {
 
     pub fn clear(&mut self) {
         self.text = "".to_owned();
+        self.message = None;
         self.error = None;
     }
 
@@ -65,15 +68,22 @@ impl Prompt {
         match self.error {
             Some(ref text) => ui::waddnstr(self.nwindow, text, -1),
             None => {
-                ui::waddnstr(self.nwindow, &self.text, -1)
+                match self.message {
+                    Some(ref text) => ui::waddnstr(self.nwindow, text, -1),
+                    None => ui::waddnstr(self.nwindow, &self.text, -1),
+                };
             },
-        }
+        };
 
         ui::wnoutrefresh(self.nwindow);
     }
 
     pub fn display_error(&mut self, text: &str) {
         self.error = Some(text.to_owned());
+    }
+
+    pub fn display_message(&mut self, text: &str) {
+        self.message = Some(text.to_owned());
     }
 
     pub fn add_char(&mut self, ic: u32) {

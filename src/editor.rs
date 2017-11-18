@@ -163,6 +163,8 @@ impl Editor {
 
         buffer.borrow_mut().load(filename)?;
 
+        self.prompt.display_message(&format!("\"{}\"", &filename));
+
         Ok(())
     }
 }
