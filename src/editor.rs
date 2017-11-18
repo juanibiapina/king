@@ -114,28 +114,24 @@ impl Editor {
     }
 
     fn finish_prompt(&mut self) -> Result<()> {
+        self.switch_to_normal()?;
+
         let text = self.prompt.get_text();
         self.prompt.clear();
+
         match text {
             Some(text) => {
-                let command = Command::parse(&text);
+                let command = Command::parse(&text)?;
 
                 match command {
-                    Ok(command) => {
-                        match command {
-                            Command::Quit => self.exit()?,
-                            Command::Edit(filename) => self.edit(&filename)?,
-                        };
-                    },
-                    Err(err) => {
-                        self.prompt.display_error(&error_message(err));
-                    }
-                }
+                    Command::Quit => self.exit()?,
+                    Command::Edit(filename) => self.edit(&filename)?,
+                };
             }
             None => {},
         };
 
-        self.switch_to_normal()
+        Ok(())
     }
 
     fn switch_to_prompt(&mut self, ic: u32) -> Result<()> {
