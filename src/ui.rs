@@ -27,6 +27,10 @@ pub fn addstr(s: &str) {
     nc::addstr(s);
 }
 
+pub fn waddstr(w: nc::WINDOW, s: &str) {
+    nc::waddstr(w, s);
+}
+
 pub fn addch(c: u32) {
     nc::addch(c);
 }
@@ -47,10 +51,26 @@ pub fn getmaxy() -> i32 {
     nc::getmaxy(nc::stdscr())
 }
 
+pub fn getmaxx() -> i32 {
+    nc::getmaxx(nc::stdscr())
+}
+
+pub fn wmove(w: nc::WINDOW, y: i32, x: i32) {
+    nc::wmove(w, y, x);
+}
+
 pub fn mv(y: i32, x: i32) {
     nc::mv(y, x);
 }
 
 pub fn clrtoeol() {
     nc::clrtoeol();
+}
+
+pub fn newwin(lines: i32, cols: i32, y: i32, x: i32) -> nc::WINDOW {
+    nc::newwin(lines, cols, y, x)
+}
+
+pub fn wrefresh(w: nc::WINDOW) {
+    nc::wrefresh(w);
 }

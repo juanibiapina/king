@@ -1,17 +1,25 @@
+extern crate ncurses;
+
 use std::rc::Rc;
 use std::cell::RefCell;
+
+use self::ncurses as nc;
 
 use ui;
 use buffer::Buffer;
 
 pub struct Window {
     buffer: Rc<RefCell<Buffer>>,
+    nwindow: nc::WINDOW,
 }
 
 impl Window {
-    pub fn new(buffer: Rc<RefCell<Buffer>>) -> Window {
+    pub fn new(height: i32, width: i32, buffer: Rc<RefCell<Buffer>>) -> Window {
+        let nwindow = ui::newwin(height, width, 0, 0);
+
         Window {
             buffer: buffer,
+            nwindow: nwindow,
         }
     }
 
@@ -20,8 +28,10 @@ impl Window {
     }
 
     pub fn render(&self) {
+        ui::wmove(self.nwindow, 0, 0);
+        ui::waddstr(self.nwindow, &self.buffer.borrow().contents);
         ui::mv(0, 0);
-        ui::addstr(&self.buffer.borrow().contents);
+        ui::wrefresh(self.nwindow);
     }
 
     pub fn get_buffer(&self) -> Rc<RefCell<Buffer>> {

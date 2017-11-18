@@ -22,9 +22,10 @@ impl Editor {
         ui::init();
 
         let max_y = ui::getmaxy();
+        let max_x = ui::getmaxx();
 
         let buffer = Rc::new(RefCell::new(Buffer::new()));
-        let window = Window::new(buffer.clone());
+        let window = Window::new(max_y - 1, max_x, buffer.clone());
 
         Editor {
             prompt: Prompt::new(max_y - 1),
