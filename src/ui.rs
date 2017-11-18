@@ -23,32 +23,12 @@ pub fn get_key() ->  Option<Key> {
     }
 }
 
-pub fn addstr(s: &str) {
-    nc::addstr(s);
-}
-
 pub fn waddstr(w: nc::WINDOW, s: &str) {
     nc::waddstr(w, s);
 }
 
 pub fn waddnstr(w: nc::WINDOW, s: &str, n: i32) {
     nc::waddnstr(w, s, n);
-}
-
-pub fn addch(c: u32) {
-    nc::addch(c);
-}
-
-pub fn mvaddch(y: i32, x: i32, c: u32) {
-    nc::mvaddch(y, x, c);
-}
-
-pub fn getcury() -> i32 {
-    nc::getcury(nc::stdscr())
-}
-
-pub fn getcurx() -> i32 {
-    nc::getcurx(nc::stdscr())
 }
 
 pub fn getmaxy() -> i32 {
@@ -75,20 +55,12 @@ pub fn mv(y: i32, x: i32) {
     nc::mv(y, x);
 }
 
-pub fn clrtoeol() {
-    nc::clrtoeol();
-}
-
 pub fn newwin(lines: i32, cols: i32, y: i32, x: i32) -> nc::WINDOW {
     nc::newwin(lines, cols, y, x)
 }
 
 pub fn wnoutrefresh(w: nc::WINDOW) {
     nc::wnoutrefresh(w);
-}
-
-pub fn refresh() {
-    nc::refresh();
 }
 
 pub fn werase(w: nc::WINDOW) {

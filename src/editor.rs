@@ -29,10 +29,11 @@ impl Editor {
 
         let buffer = create_buffer();
         let window = Window::new(max_y - 1, max_x, buffer.clone());
+        let prompt = Prompt::new(max_y - 1);
 
         let editor = Editor {
             mode: Mode::Normal,
-            prompt: Prompt::new(max_y - 1),
+            prompt: prompt,
             window: window,
             running: true,
             buffers: vec![buffer.clone()],
@@ -66,7 +67,6 @@ impl Editor {
     fn render(&self) {
         self.window.render();
         self.prompt.render();
-        ui::refresh(); // until prompt becomes a window
         ui::doupdate();
     }
 

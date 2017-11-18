@@ -1,19 +1,26 @@
+extern crate ncurses;
+
 use std::char;
+
+use self::ncurses as nc;
 
 use ui;
 
 pub struct Prompt {
-    y: i32,
     text: Option<String>,
     error: Option<String>,
+    nwindow: nc::WINDOW,
 }
 
 impl Prompt {
     pub fn new(y: i32) -> Prompt {
+        let max_x = ui::getmaxx();
+        let nwindow = ui::newwin(1, max_x, y, 0);
+
         Prompt {
-            y: y,
             text: None,
             error: None,
+            nwindow: nwindow,
         }
     }
 
@@ -32,18 +39,20 @@ impl Prompt {
     }
 
     pub fn render(&self) {
-        ui::mv(self.y, 0);
-        ui::clrtoeol();
+        ui::werase(self.nwindow);
+        ui::wmove(self.nwindow, 0, 0);
 
         match self.error {
-            Some(ref text) => ui::addstr(text),
+            Some(ref text) => ui::waddnstr(self.nwindow, text, -1),
             None => {
                 match self.text {
-                    Some(ref text) => ui::addstr(text),
+                    Some(ref text) => ui::waddnstr(self.nwindow, text, -1),
                     None => {},
                 }
             },
         }
+
+        ui::wnoutrefresh(self.nwindow);
     }
 
     pub fn display_error(&mut self, text: &str) {
