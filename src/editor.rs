@@ -4,6 +4,7 @@ use key::Key;
 use prompt::Prompt;
 use command::Command;
 use error::error_message;
+use std::collections::HashMap;
 use buffer::{create_buffer, SharedBuffer};
 use window::Window;
 
@@ -17,7 +18,7 @@ pub struct Editor {
     running: bool,
     prompt: Prompt,
     window: Window,
-    buffers: Vec<SharedBuffer>,
+    buffers: HashMap<String, SharedBuffer>,
 }
 
 impl Editor {
@@ -31,12 +32,15 @@ impl Editor {
         let window = Window::new(max_y - 1, max_x, buffer.clone());
         let prompt = Prompt::new(max_y - 1);
 
+        let mut buffers = HashMap::new();
+        buffers.insert(String::new(), buffer);
+
         let editor = Editor {
             mode: Mode::Normal,
             prompt: prompt,
             window: window,
             running: true,
-            buffers: vec![buffer.clone()],
+            buffers: buffers,
         };
 
         editor.render();
@@ -155,14 +159,18 @@ impl Editor {
     }
 
     fn edit(&mut self, filename: &str) -> Result<()> {
-        let buffer;
+        if let Some(buffer) = self.buffers.get(filename) {
+            self.window.set_buffer(buffer.clone());
+            return Ok(())
+        }
 
+        let buffer;
         if self.window.is_fresh() {
             buffer = self.window.get_buffer();
         } else {
             buffer = create_buffer();
-            self.buffers.push(buffer.clone());
             self.window.set_buffer(buffer.clone());
+            self.buffers.insert(filename.to_string(), buffer);
         }
 
         buffer.borrow_mut().load(filename)?;
