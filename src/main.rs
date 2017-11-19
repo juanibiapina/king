@@ -3,6 +3,7 @@ extern crate king;
 use king::editor::Editor;
 use king::input;
 use king::error::error_message;
+use king::ui;
 
 fn main() {
     let mut editor = Editor::init();
@@ -17,5 +18,5 @@ fn main() {
         editor.render();
     }
 
-    editor.finish();
+    ui::finish();
 }

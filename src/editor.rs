@@ -43,10 +43,6 @@ impl Editor {
         self.running
     }
 
-    pub fn finish(&self) {
-        ui::finish();
-    }
-
     pub fn display_error(&mut self, text: &str) {
         self.prompt.display_error(text);
     }
