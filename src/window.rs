@@ -10,6 +10,7 @@ use buffer::SharedBuffer;
 pub struct Window {
     buffer: SharedBuffer,
     nwindow: nc::WINDOW,
+    scroll_pos: i32,
     cur_y: i32,
     cur_x: i32,
     height: i32,
@@ -23,6 +24,7 @@ impl Window {
         Window {
             buffer: buffer,
             nwindow: nwindow,
+            scroll_pos: 0,
             cur_y: 0,
             cur_x: 0,
             height: height,
@@ -38,12 +40,21 @@ impl Window {
         let contents = &self.buffer.borrow().contents;
         let contents_len = contents.len() as i32;
 
+        if self.cur_y >= self.height && self.cur_y < contents_len - 1 {
+            self.cur_y = self.height - 1;
+            self.scroll_pos += 1;
+        }
+
         if self.cur_y >= contents_len {
             self.cur_y = contents_len - 1;
         }
 
         if self.cur_y < 0 {
             self.cur_y = 0;
+
+            if self.scroll_pos > 0 {
+                self.scroll_pos -= 1;
+            }
         }
 
         if self.cur_y >= self.height {
@@ -84,7 +95,9 @@ impl Window {
         let max_x = ui::wgetmaxx(self.nwindow);
 
         let mut current_line = 0;
-        for line in &self.buffer.borrow().contents {
+        let contents = &self.buffer.borrow().contents;
+        let sliced = &contents[self.scroll_pos as usize .. ];
+        for line in sliced {
             ui::wmove(self.nwindow, current_line, 0);
             ui::waddnstr(self.nwindow, line, max_x);
 
@@ -112,7 +125,7 @@ impl Window {
     }
 
     pub fn add_char(&mut self, ic: u32) {
-        let current_line = &mut self.buffer.borrow_mut().contents[self.cur_y as usize];
+        let current_line = &mut self.buffer.borrow_mut().contents[(self.scroll_pos + self.cur_y) as usize];
 
         current_line.insert(self.cur_x as usize, char::from_u32(ic).unwrap());
 
