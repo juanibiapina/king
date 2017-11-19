@@ -1,5 +1,4 @@
 use error::Result;
-use ui;
 use input::Key;
 use prompt::{self, Prompt};
 use command::Command;
@@ -16,15 +15,10 @@ pub struct Editor {
 }
 
 impl Editor {
-    pub fn init() -> Editor {
-        ui::init();
-
-        let max_y = ui::getmaxy();
-        let max_x = ui::getmaxx();
-
+    pub fn init(height: i32, width: i32) -> Editor {
         let buffer = create_buffer();
-        let window = Window::new(max_y - 1, max_x, buffer.clone());
-        let prompt = Prompt::new(max_y - 1);
+        let window = Window::new(height - 1, width, buffer.clone());
+        let prompt = Prompt::new(height - 1);
 
         let editor = Editor {
             mode: Mode::Normal,

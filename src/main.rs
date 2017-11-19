@@ -6,7 +6,9 @@ use king::error::error_message;
 use king::ui;
 
 fn main() {
-    let mut editor = Editor::init();
+    ui::init();
+
+    let mut editor = Editor::init(ui::getmaxy(), ui::getmaxx());
 
     while editor.running() {
         if let Some(key) = input::read_key() {
