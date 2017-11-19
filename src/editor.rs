@@ -46,17 +46,16 @@ impl Editor {
 
     pub fn run(&mut self) {
         while self.running {
-            let key = input::read_key();
-
-            match key {
-                Some(key) => match self.handle_key(key) {
-                    Ok(()) => {},
-                    Err(err) => self.prompt.display_error(&error_message(err)),
-                },
-                None => {},
-            };
-
+            self.update();
             self.render();
+        }
+    }
+
+    fn update(&mut self) {
+        if let Some(key) = input::read_key() {
+            if let Err(err) = self.handle_key(key) {
+                self.prompt.display_error(&error_message(err));
+            }
         }
     }
 
