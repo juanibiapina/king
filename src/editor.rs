@@ -64,15 +64,9 @@ impl Editor {
         self.prompt.render();
 
         match self.mode {
-            Mode::Normal => {
-                self.window.render_cursor();
-            },
-            Mode::Insert => {
-                self.window.render_cursor();
-            },
-            Mode::Prompt => {
-                self.prompt.render_cursor();
-            },
+            Mode::Normal => self.window.render_cursor(),
+            Mode::Insert => self.window.render_cursor(),
+            Mode::Prompt => self.prompt.render_cursor(),
         }
 
         ui::doupdate();
