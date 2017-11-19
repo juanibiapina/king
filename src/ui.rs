@@ -3,6 +3,7 @@ extern crate ncurses;
 use self::ncurses as nc;
 
 pub fn init() {
+    nc::setlocale(nc::LcCategory::all, "");
     nc::initscr();
     check(nc::keypad(nc::stdscr(), true));
     check(nc::noecho());
