@@ -15,7 +15,7 @@ fn main() {
             }
         }
 
-        editor.render();
+        ui::render(&editor);
     }
 
     ui::finish();

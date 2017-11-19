@@ -11,7 +11,7 @@ pub struct Editor {
     pub mode: Mode,
     running: bool,
     pub prompt: Prompt,
-    window: Window,
+    pub window: Window,
     buffers: Vec<SharedBuffer>,
 }
 
@@ -34,8 +34,6 @@ impl Editor {
             buffers: vec![buffer.clone()],
         };
 
-        editor.render();
-
         return editor;
     }
 
@@ -45,19 +43,6 @@ impl Editor {
 
     pub fn display_error(&mut self, text: &str) {
         self.prompt.display_error(text);
-    }
-
-    pub fn render(&self) {
-        self.window.render();
-        self.prompt.render();
-
-        match self.mode {
-            Mode::Normal => self.window.render_cursor(),
-            Mode::Insert => self.window.render_cursor(),
-            Mode::Prompt => self.prompt.render_cursor(),
-        }
-
-        ui::doupdate();
     }
 
     pub fn handle_key(&mut self, key: Key) -> Result<()> {

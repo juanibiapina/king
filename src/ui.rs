@@ -2,6 +2,9 @@ extern crate ncurses;
 
 use self::ncurses as nc;
 
+use editor::Editor;
+use mode::Mode;
+
 pub fn init() {
     nc::setlocale(nc::LcCategory::all, "");
     nc::initscr();
@@ -14,6 +17,20 @@ pub fn init() {
 pub fn finish() {
     check(nc::endwin());
 }
+
+pub fn render(ed: &Editor) {
+    ed.window.render();
+    ed.prompt.render();
+
+    match ed.mode {
+        Mode::Normal => ed.window.render_cursor(),
+        Mode::Insert => ed.window.render_cursor(),
+        Mode::Prompt => ed.prompt.render_cursor(),
+    }
+
+    doupdate();
+}
+
 
 pub fn waddstr(w: nc::WINDOW, s: &str) {
     check(nc::waddstr(w, s));
