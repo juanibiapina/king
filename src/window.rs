@@ -95,23 +95,20 @@ impl Window {
     pub fn render(&self) {
         ui::werase(self.nwindow);
 
-        let max_y = ui::wgetmaxy(self.nwindow);
-        let max_x = ui::wgetmaxx(self.nwindow);
-
         let mut current_line = 0;
         let contents = &self.buffer.borrow().contents;
         let sliced = &contents[self.scroll_pos as usize .. ];
         for line in sliced {
             ui::wmove(self.nwindow, current_line, 0);
-            ui::waddnstr(self.nwindow, line, max_x - 1);
+            ui::waddnstr(self.nwindow, line, self.width - 1);
 
             current_line += 1;
-            if current_line == max_y {
+            if current_line == self.height {
                 break;
             }
         }
 
-        while current_line < max_y {
+        while current_line < self.height {
             ui::wmove(self.nwindow, current_line, 0);
             ui::waddstr(self.nwindow, "~");
             current_line += 1;

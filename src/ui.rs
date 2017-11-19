@@ -31,14 +31,6 @@ pub fn getmaxx() -> i32 {
     nc::getmaxx(nc::stdscr())
 }
 
-pub fn wgetmaxy(w: nc::WINDOW) -> i32 {
-    nc::getmaxy(w)
-}
-
-pub fn wgetmaxx(w: nc::WINDOW) -> i32 {
-    nc::getmaxx(w)
-}
-
 pub fn wmove(w: nc::WINDOW, y: i32, x: i32) {
     check(nc::wmove(w, y, x));
 }
