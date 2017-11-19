@@ -9,7 +9,7 @@ use error::{Error, Result};
 pub type SharedBuffer = Rc<RefCell<Buffer>>;
 
 pub struct Buffer {
-    name: Option<String>,
+    filename: Option<String>,
     pub contents: Vec<String>,
 }
 
@@ -20,19 +20,19 @@ pub fn create_buffer() -> SharedBuffer {
 impl Buffer {
     pub fn new() -> Buffer {
         Buffer {
-            name: None,
+            filename: None,
             contents: vec![String::new()],
         }
     }
 
     pub fn is_fresh(&self) -> bool {
-        self.name.is_none() && self.contents.len() == 1 && self.contents[0].is_empty()
+        self.filename.is_none() && self.contents.len() == 1 && self.contents[0].is_empty()
     }
 
     pub fn write(&mut self) -> Result<()> {
-        match self.name {
-            Some(ref name) => {
-                match File::create(name) {
+        match self.filename {
+            Some(ref filename) => {
+                match File::create(filename) {
                     Ok(file) => {
                         let mut writer = BufWriter::new(file);
                         for line in &self.contents {
@@ -61,7 +61,7 @@ impl Buffer {
                 let reader = BufReader::new(file);
                 match reader.lines().collect::<io::Result<Vec<_>>>() {
                     Ok(lines) => {
-                        self.name = Some(filename.to_owned());
+                        self.filename = Some(filename.to_owned());
                         if lines.len() == 0 {
                             self.contents = vec![String::new()];
                         } else {
@@ -76,7 +76,7 @@ impl Buffer {
             Err(err) => {
                 match err.kind() {
                     ErrorKind::NotFound => {
-                        self.name = Some(filename.to_owned());
+                        self.filename = Some(filename.to_owned());
                         self.contents = vec![String::new()];
 
                         Ok(())
