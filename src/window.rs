@@ -144,8 +144,7 @@ impl Window {
         self.buffer = buffer;
     }
 
-    pub fn add_char(&mut self, ic: u32) {
-        let c = char::from_u32(ic).unwrap();
+    pub fn add_char(&mut self, c: char) {
         let current_line = &mut self.buffer.borrow_mut().contents[(self.scroll_pos + self.cur_y) as usize];
 
         if (self.cur_x as usize) >= unicode::width(&current_line) {

@@ -1,7 +1,6 @@
 use error::Result;
 use ui;
-use input;
-use key::Key;
+use input::{self, Key};
 use prompt::{self, Prompt};
 use command::Command;
 use error::error_message;
@@ -90,18 +89,18 @@ impl Editor {
 
     fn handle_key_normal(&mut self, key: Key) -> Result<()> {
         match key {
-            Key::Code(_) => {},
-            Key::Char(ic) => {
-                match ic {
-                    58 => self.switch_to_prompt(58),
-                    105 => self.switch_to_insert(),
-                    104 => self.window.move_cursor(0, -1),
-                    106 => self.window.move_cursor(1, 0),
-                    107 => self.window.move_cursor(-1, 0),
-                    108 => self.window.move_cursor(0, 1),
+            Key::Char(c) => {
+                match c {
+                    ':' => self.switch_to_prompt(':'),
+                    'i' => self.switch_to_insert(),
+                    'h' => self.window.move_cursor(0, -1),
+                    'j' => self.window.move_cursor(1, 0),
+                    'k' => self.window.move_cursor(-1, 0),
+                    'l' => self.window.move_cursor(0, 1),
                     _ => {},
                 };
             },
+            _ => {},
         };
 
         Ok(())
@@ -109,15 +108,10 @@ impl Editor {
 
     fn handle_key_prompt(&mut self, key: Key) -> Result<()> {
         match key {
-            Key::Code(_) => {},
-            Key::Char(ic) => {
-                match ic {
-                    13 => self.finish_prompt()?,
-                    27 => self.cancel_prompt(),
-                    127 => prompt::delete_char(self),
-                    ic => self.prompt.add_char(ic),
-                }
-            },
+            Key::Char(c) => self.prompt.add_char(c),
+            Key::Esc => self.cancel_prompt(),
+            Key::Backspace => prompt::delete_char(self),
+            Key::Enter => self.finish_prompt()?,
         };
 
         Ok(())
@@ -125,12 +119,9 @@ impl Editor {
 
     fn handle_key_insert(&mut self, key: Key) -> Result<()> {
         match key {
-            Key::Code(_) => {},
-            Key::Char(ic) =>
-                match ic {
-                    27 => self.switch_to_normal(),
-                    ic => self.window.add_char(ic),
-                }
+            Key::Char(c) => self.window.add_char(c),
+            Key::Esc => self.cancel_prompt(),
+            _ => {},
         };
 
         Ok(())
@@ -162,9 +153,9 @@ impl Editor {
         self.prompt.clear();
     }
 
-    fn switch_to_prompt(&mut self, ic: u32) {
+    fn switch_to_prompt(&mut self, c: char) {
         self.mode = Mode::Prompt;
-        self.prompt.start(ic);
+        self.prompt.start(c);
     }
 
     fn switch_to_insert(&mut self) {

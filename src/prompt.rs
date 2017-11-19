@@ -46,7 +46,7 @@ impl Prompt {
         ui::wnoutrefresh(self.nwindow);
     }
 
-    pub fn start(&mut self, starting_char: u32) {
+    pub fn start(&mut self, starting_char: char) {
         self.clear();
         self.add_char(starting_char);
     }
@@ -86,7 +86,7 @@ impl Prompt {
         self.message = Some(text.to_owned());
     }
 
-    pub fn add_char(&mut self, ic: u32) {
-        self.text.push(char::from_u32(ic).unwrap());
+    pub fn add_char(&mut self, c: char) {
+        self.text.push(c);
     }
 }
