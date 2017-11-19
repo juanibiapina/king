@@ -3,6 +3,7 @@ use error::{Error, Result};
 pub enum Command {
     Quit,
     Edit(String),
+    Write,
 }
 
 impl Command {
@@ -11,6 +12,7 @@ impl Command {
 
         match words[0] {
             ":quit" => Ok(Command::Quit),
+            ":write" => Ok(Command::Write),
             ":edit" => Ok(Command::Edit(words[1].to_owned())),
             _ => Err(Error::CommandNotFound(text.to_owned())),
         }

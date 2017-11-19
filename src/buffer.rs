@@ -2,7 +2,7 @@ use std::io;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::fs::File;
-use std::io::{BufRead, BufReader, ErrorKind};
+use std::io::{BufRead, BufReader, Write, BufWriter, ErrorKind};
 
 use error::{Error, Result};
 
@@ -27,6 +27,32 @@ impl Buffer {
 
     pub fn is_fresh(&self) -> bool {
         self.name.is_none() && self.contents.len() == 1 && self.contents[0].is_empty()
+    }
+
+    pub fn write(&mut self) -> Result<()> {
+        match self.name {
+            Some(ref name) => {
+                match File::create(name) {
+                    Ok(file) => {
+                        let mut writer = BufWriter::new(file);
+                        for line in &self.contents {
+                            match writer.write(line.as_bytes()) {
+                                Ok(_) => {},
+                                Err(err) => return Err(Error::IoError(err)),
+                            };
+                            match writer.write("\n".as_bytes()) {
+                                Ok(_) => {},
+                                Err(err) => return Err(Error::IoError(err)),
+                            };
+                        }
+
+                        return Ok(());
+                    },
+                    Err(err) => return Err(Error::IoError(err)),
+                }
+            },
+            None => return Err(Error::NoFileName),
+        };
     }
 
     pub fn load(&mut self, filename: &str) -> Result<()> {

@@ -149,6 +149,7 @@ impl Editor {
 
         match command {
             Command::Quit => self.exit()?,
+            Command::Write => self.write()?,
             Command::Edit(filename) => self.edit(&filename)?,
         };
 
@@ -175,6 +176,14 @@ impl Editor {
 
     fn exit(&mut self) -> Result<()> {
         self.running = false;
+
+        Ok(())
+    }
+
+    fn write(&mut self) -> Result<()> {
+        let buffer = self.window.get_buffer();
+
+        buffer.borrow_mut().write()?;
 
         Ok(())
     }
