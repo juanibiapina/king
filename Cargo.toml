@@ -5,3 +5,5 @@ authors = ["Juan Ibiapina <juanibiapina@gmail.com>"]
 
 [dependencies]
 ncurses = "*"
+unicode-width = "*"
+unicode-segmentation = "*"

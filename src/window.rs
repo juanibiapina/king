@@ -6,6 +6,7 @@ use self::ncurses as nc;
 
 use ui;
 use buffer::SharedBuffer;
+use unicode;
 
 pub struct Window {
     buffer: SharedBuffer,
@@ -64,7 +65,7 @@ impl Window {
             self.cur_y = self.height - 1;
         }
 
-        let line_len = contents[self.cur_y as usize].len() as i32;
+        let line_len = unicode::width(&contents[self.cur_y as usize]) as i32;
 
         if self.cur_x >= line_len {
             self.cur_x = line_len - 1;
@@ -128,10 +129,17 @@ impl Window {
     }
 
     pub fn add_char(&mut self, ic: u32) {
+        let c = char::from_u32(ic).unwrap();
         let current_line = &mut self.buffer.borrow_mut().contents[(self.scroll_pos + self.cur_y) as usize];
 
-        current_line.insert(self.cur_x as usize, char::from_u32(ic).unwrap());
+        if (self.cur_x as usize) >= unicode::width(&current_line) {
+            current_line.push(c);
+        } else {
+            let byte_pos = unicode::byte_index_for_grapheme_index(&current_line, self.cur_x as usize);
 
-        self.cur_x += 1;
+            current_line.insert(byte_pos, c);
+        }
+
+        self.cur_x += unicode::width_char(c) as i32;
     }
 }
