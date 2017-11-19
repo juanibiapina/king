@@ -1,5 +1,6 @@
 use error::Result;
 use ui;
+use input;
 use key::Key;
 use prompt::{self, Prompt};
 use command::Command;
@@ -46,7 +47,7 @@ impl Editor {
 
     pub fn run(&mut self) {
         while self.running {
-            let key = ui::get_key();
+            let key = input::read_key();
 
             match key {
                 Some(key) => match self.handle_key(key) {

@@ -2,8 +2,6 @@ extern crate ncurses;
 
 use self::ncurses as nc;
 
-use key::Key;
-
 pub fn init() {
     nc::initscr();
     check(nc::keypad(nc::stdscr(), true));
@@ -14,14 +12,6 @@ pub fn init() {
 
 pub fn finish() {
     check(nc::endwin());
-}
-
-pub fn get_key() ->  Option<Key> {
-    match nc::wget_wch(nc::stdscr()) {
-        Some(nc::WchResult::KeyCode(i)) => Some(Key::Code(i)),
-        Some(nc::WchResult::Char(ic)) => Some(Key::Char(ic)),
-        None => None,
-    }
 }
 
 pub fn waddstr(w: nc::WINDOW, s: &str) {
