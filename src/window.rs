@@ -40,9 +40,12 @@ impl Window {
         let contents = &self.buffer.borrow().contents;
         let contents_len = contents.len() as i32;
 
-        if self.cur_y >= self.height && self.cur_y < contents_len - 1 {
+        if self.cur_y >= self.height {
             self.cur_y = self.height - 1;
-            self.scroll_pos += 1;
+
+            if self.cur_y + self.scroll_pos < contents_len - 1 {
+                self.scroll_pos += 1;
+            }
         }
 
         if self.cur_y >= contents_len {
