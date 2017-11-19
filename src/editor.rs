@@ -1,9 +1,8 @@
 use error::Result;
 use ui;
-use input::{self, Key};
+use input::Key;
 use prompt::{self, Prompt};
 use command::Command;
-use error::error_message;
 use buffer::{create_buffer, SharedBuffer};
 use mode::Mode;
 use window::Window;
@@ -40,26 +39,19 @@ impl Editor {
         return editor;
     }
 
+    pub fn running(&self) -> bool {
+        self.running
+    }
+
     pub fn finish(&self) {
         ui::finish();
     }
 
-    pub fn run(&mut self) {
-        while self.running {
-            self.update();
-            self.render();
-        }
+    pub fn display_error(&mut self, text: &str) {
+        self.prompt.display_error(text);
     }
 
-    fn update(&mut self) {
-        if let Some(key) = input::read_key() {
-            if let Err(err) = self.handle_key(key) {
-                self.prompt.display_error(&error_message(err));
-            }
-        }
-    }
-
-    fn render(&self) {
+    pub fn render(&self) {
         self.window.render();
         self.prompt.render();
 
@@ -72,7 +64,7 @@ impl Editor {
         ui::doupdate();
     }
 
-    fn handle_key(&mut self, key: Key) -> Result<()> {
+    pub fn handle_key(&mut self, key: Key) -> Result<()> {
         match self.mode {
             Mode::Normal => self.handle_key_normal(key),
             Mode::Insert => self.handle_key_insert(key),
