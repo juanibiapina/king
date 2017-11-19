@@ -99,7 +99,7 @@ impl Window {
         let sliced = &contents[self.scroll_pos as usize .. ];
         for line in sliced {
             ui::wmove(self.nwindow, current_line, 0);
-            ui::waddnstr(self.nwindow, line, max_x);
+            ui::waddnstr(self.nwindow, line, max_x - 1);
 
             current_line += 1;
             if current_line == max_y {
