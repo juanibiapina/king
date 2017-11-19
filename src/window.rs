@@ -95,23 +95,42 @@ impl Window {
     pub fn render(&self) {
         ui::werase(self.nwindow);
 
-        let mut current_line = 0;
         let contents = &self.buffer.borrow().contents;
-        let sliced = &contents[self.scroll_pos as usize .. ];
-        for line in sliced {
-            ui::wmove(self.nwindow, current_line, 0);
-            ui::waddnstr(self.nwindow, line, self.width - 1);
 
-            current_line += 1;
-            if current_line == self.height {
+        let mut row = 0;
+        loop {
+            if row >= self.height {
                 break;
             }
+
+            let line_number = row + self.scroll_pos;
+
+            if line_number >= contents.len() as i32 {
+                break;
+            }
+
+            let line = &contents[line_number as usize];
+
+            let mut column = 0;
+            for grapheme in unicode::graphemes(line, true) {
+                let size = unicode::width(grapheme);
+
+                if (column as usize) + size >= self.width as usize {
+                    break;
+                }
+
+                ui::wmove(self.nwindow, row, column);
+                ui::waddstr(self.nwindow, grapheme);
+                column += size as i32;
+            }
+
+            row += 1;
         }
 
-        while current_line < self.height {
-            ui::wmove(self.nwindow, current_line, 0);
+        while row < self.height {
+            ui::wmove(self.nwindow, row, 0);
             ui::waddstr(self.nwindow, "~");
-            current_line += 1;
+            row += 1;
         }
 
         ui::wnoutrefresh(self.nwindow);
