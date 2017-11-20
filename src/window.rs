@@ -9,13 +9,13 @@ use buffer::SharedBuffer;
 use unicode;
 
 pub struct Window {
-    buffer: SharedBuffer,
-    nwindow: nc::WINDOW,
-    scroll_pos: i32,
-    cur_y: i32,
-    cur_x: i32,
-    height: i32,
-    width: i32,
+    pub buffer: SharedBuffer,
+    pub nwindow: nc::WINDOW,
+    pub scroll_pos: i32,
+    pub cur_y: i32,
+    pub cur_x: i32,
+    pub height: i32,
+    pub width: i32,
 }
 
 impl Window {
@@ -89,50 +89,6 @@ impl Window {
 
     pub fn render_cursor(&self) {
         ui::wmove(self.nwindow, self.cur_y, self.cur_x);
-        ui::wnoutrefresh(self.nwindow);
-    }
-
-    pub fn render(&self) {
-        ui::werase(self.nwindow);
-
-        let contents = &self.buffer.borrow().contents;
-
-        let mut row = 0;
-        loop {
-            if row >= self.height {
-                break;
-            }
-
-            let line_number = row + self.scroll_pos;
-
-            if line_number >= contents.len() as i32 {
-                break;
-            }
-
-            let line = &contents[line_number as usize];
-
-            let mut column = 0;
-            for grapheme in unicode::graphemes(line, true) {
-                let size = unicode::width(grapheme);
-
-                if (column as usize) + size >= self.width as usize {
-                    break;
-                }
-
-                ui::wmove(self.nwindow, row, column);
-                ui::waddstr(self.nwindow, grapheme);
-                column += size as i32;
-            }
-
-            row += 1;
-        }
-
-        while row < self.height {
-            ui::wmove(self.nwindow, row, 0);
-            ui::waddstr(self.nwindow, "~");
-            row += 1;
-        }
-
         ui::wnoutrefresh(self.nwindow);
     }
 

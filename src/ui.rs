@@ -4,6 +4,7 @@ use self::ncurses as nc;
 
 use editor::Editor;
 use mode::Mode;
+use unicode;
 
 pub fn init() {
     nc::setlocale(nc::LcCategory::all, "");
@@ -19,8 +20,8 @@ pub fn finish() {
 }
 
 pub fn render(ed: &Editor) {
-    ed.window.render();
-    ed.prompt.render();
+    render_window(ed);
+    render_prompt(ed);
 
     match ed.mode {
         Mode::Normal => ed.window.render_cursor(),
@@ -31,12 +32,72 @@ pub fn render(ed: &Editor) {
     doupdate();
 }
 
+fn render_prompt(ed: &Editor) {
+    werase(ed.prompt.nwindow);
+    wmove(ed.prompt.nwindow, 0, 0);
 
-pub fn waddstr(w: nc::WINDOW, s: &str) {
+    match ed.prompt.error {
+        Some(ref text) => waddnstr(ed.prompt.nwindow, text, -1),
+        None => {
+            match ed.prompt.message {
+                Some(ref text) => waddnstr(ed.prompt.nwindow, text, -1),
+                None => waddnstr(ed.prompt.nwindow, &ed.prompt.text, -1),
+            };
+        },
+    };
+
+    wnoutrefresh(ed.prompt.nwindow);
+}
+
+fn render_window(ed: &Editor) {
+    werase(ed.window.nwindow);
+
+    let contents = &ed.window.buffer.borrow().contents;
+
+    let mut row = 0;
+    loop {
+        if row >= ed.window.height {
+            break;
+        }
+
+        let line_number = row + ed.window.scroll_pos;
+
+        if line_number >= contents.len() as i32 {
+            break;
+        }
+
+        let line = &contents[line_number as usize];
+
+        let mut column = 0;
+        for grapheme in unicode::graphemes(line, true) {
+            let size = unicode::width(grapheme);
+
+            if (column as usize) + size >= ed.window.width as usize {
+                break;
+            }
+
+            wmove(ed.window.nwindow, row, column);
+            waddstr(ed.window.nwindow, grapheme);
+            column += size as i32;
+        }
+
+        row += 1;
+    }
+
+    while row < ed.window.height {
+        wmove(ed.window.nwindow, row, 0);
+        waddstr(ed.window.nwindow, "~");
+        row += 1;
+    }
+
+    wnoutrefresh(ed.window.nwindow);
+}
+
+fn waddstr(w: nc::WINDOW, s: &str) {
     check(nc::waddstr(w, s));
 }
 
-pub fn waddnstr(w: nc::WINDOW, s: &str, n: i32) {
+fn waddnstr(w: nc::WINDOW, s: &str, n: i32) {
     check(nc::waddnstr(w, s, n));
 }
 
@@ -60,7 +121,7 @@ pub fn wnoutrefresh(w: nc::WINDOW) {
     check(nc::wnoutrefresh(w));
 }
 
-pub fn werase(w: nc::WINDOW) {
+fn werase(w: nc::WINDOW) {
     check(nc::werase(w));
 }
 

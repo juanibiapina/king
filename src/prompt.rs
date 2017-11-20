@@ -9,10 +9,10 @@ use editor::Editor;
 use mode::Mode;
 
 pub struct Prompt {
-    text: String,
-    error: Option<String>,
-    message: Option<String>,
-    nwindow: nc::WINDOW,
+    pub text: String,
+    pub error: Option<String>,
+    pub message: Option<String>,
+    pub nwindow: nc::WINDOW,
 }
 
 pub fn delete_char(editor: &mut Editor) {
@@ -59,23 +59,6 @@ impl Prompt {
         self.text = "".to_owned();
         self.message = None;
         self.error = None;
-    }
-
-    pub fn render(&self) {
-        ui::werase(self.nwindow);
-        ui::wmove(self.nwindow, 0, 0);
-
-        match self.error {
-            Some(ref text) => ui::waddnstr(self.nwindow, text, -1),
-            None => {
-                match self.message {
-                    Some(ref text) => ui::waddnstr(self.nwindow, text, -1),
-                    None => ui::waddnstr(self.nwindow, &self.text, -1),
-                };
-            },
-        };
-
-        ui::wnoutrefresh(self.nwindow);
     }
 
     pub fn display_error(&mut self, text: &str) {
