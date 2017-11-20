@@ -5,6 +5,7 @@ use std::char;
 use self::ncurses as nc;
 
 use ui;
+use unicode;
 use editor::Editor;
 use mode::Mode;
 
@@ -13,10 +14,13 @@ pub struct Prompt {
     pub error: Option<String>,
     pub message: Option<String>,
     pub nwindow: nc::WINDOW,
+    pub cur_x: usize,
 }
 
 pub fn delete_char(editor: &mut Editor) {
-    editor.prompt.text.pop();
+    if let Some(c) = editor.prompt.text.pop() {
+        editor.prompt.cur_x -= unicode::width_char(c);
+    }
 
     if editor.prompt.text.is_empty() {
         end(editor);
@@ -38,11 +42,12 @@ impl Prompt {
             error: None,
             message: None,
             nwindow: nwindow,
+            cur_x: 0,
         }
     }
 
     pub fn render_cursor(&self) {
-        ui::wmove(self.nwindow, 0, self.text.len() as i32);
+        ui::wmove(self.nwindow, 0, self.cur_x as i32);
         ui::wnoutrefresh(self.nwindow);
     }
 
@@ -59,6 +64,7 @@ impl Prompt {
         self.text = "".to_owned();
         self.message = None;
         self.error = None;
+        self.cur_x = 0;
     }
 
     pub fn display_error(&mut self, text: &str) {
@@ -71,5 +77,6 @@ impl Prompt {
 
     pub fn add_char(&mut self, c: char) {
         self.text.push(c);
+        self.cur_x += unicode::width_char(c);
     }
 }

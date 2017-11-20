@@ -34,19 +34,28 @@ pub fn render(ed: &Editor) {
 
 fn render_prompt(ed: &Editor) {
     werase(ed.prompt.nwindow);
-    wmove(ed.prompt.nwindow, 0, 0);
 
     match ed.prompt.error {
-        Some(ref text) => waddnstr(ed.prompt.nwindow, text, -1),
+        Some(ref text) => render_text(ed.prompt.nwindow, text),
         None => {
             match ed.prompt.message {
-                Some(ref text) => waddnstr(ed.prompt.nwindow, text, -1),
-                None => waddnstr(ed.prompt.nwindow, &ed.prompt.text, -1),
+                Some(ref text) => render_text(ed.prompt.nwindow, text),
+                None => render_text(ed.prompt.nwindow, &ed.prompt.text),
             };
         },
     };
 
     wnoutrefresh(ed.prompt.nwindow);
+}
+
+fn render_text(w: nc::WINDOW, text: &str) {
+    let mut column = 0;
+    for grapheme in unicode::graphemes(text, true) {
+        let size = unicode::width(grapheme);
+        wmove(w, 0, column);
+        waddstr(w, grapheme);
+        column += size as i32;
+    }
 }
 
 fn render_window(ed: &Editor) {
@@ -95,10 +104,6 @@ fn render_window(ed: &Editor) {
 
 fn waddstr(w: nc::WINDOW, s: &str) {
     check(nc::waddstr(w, s));
-}
-
-fn waddnstr(w: nc::WINDOW, s: &str, n: i32) {
-    check(nc::waddnstr(w, s, n));
 }
 
 pub fn getmaxy() -> i32 {
