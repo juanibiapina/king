@@ -64,11 +64,11 @@ pub fn werase(w: nc::WINDOW) {
     check(nc::werase(w));
 }
 
-pub fn doupdate() {
+fn doupdate() {
     check(nc::doupdate());
 }
 
-pub fn check(result: i32) {
+fn check(result: i32) {
     if result == nc::ERR {
         panic!("error");
     }
