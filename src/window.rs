@@ -65,7 +65,7 @@ impl Window {
             self.cur_y = self.height - 1;
         }
 
-        let line_len = unicode::width(&contents[self.cur_y as usize]) as i32;
+        let line_len = unicode::width(&contents[(self.scroll_pos + self.cur_y) as usize]) as i32;
 
         if self.cur_x >= line_len {
             self.cur_x = line_len - 1;
