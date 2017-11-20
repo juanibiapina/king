@@ -144,6 +144,7 @@ fn doupdate() {
 
 fn check(result: i32) {
     if result == nc::ERR {
-        panic!("error");
+        finish();
+        panic!("Ncurses error");
     }
 }
