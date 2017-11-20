@@ -80,11 +80,16 @@ impl Editor {
     fn handle_key_insert(&mut self, key: Key) -> Result<()> {
         match key {
             Key::Char(c) => self.window.add_char(c),
-            Key::Esc => self.cancel_prompt(),
+            Key::Esc => self.finish_insert(),
             _ => {},
         };
 
         Ok(())
+    }
+
+    fn finish_insert(&mut self) {
+        self.switch_to_normal();
+        self.window.adjust_cursor();
     }
 
     fn finish_prompt(&mut self) -> Result<()> {

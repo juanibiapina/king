@@ -37,7 +37,7 @@ impl Window {
         self.buffer.borrow().is_fresh()
     }
 
-    fn adjust_cursor(&mut self) {
+    pub fn adjust_cursor(&mut self) {
         let contents = &self.buffer.borrow().contents;
         let contents_len = contents.len() as i32;
 
