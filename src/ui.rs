@@ -36,26 +36,16 @@ fn render_prompt(ed: &Editor) {
     werase(ed.prompt.nwindow);
 
     match ed.prompt.error {
-        Some(ref text) => render_text(ed.prompt.nwindow, text),
+        Some(ref text) => render_text(ed.prompt.nwindow, text, 0, 0),
         None => {
             match ed.prompt.message {
-                Some(ref text) => render_text(ed.prompt.nwindow, text),
-                None => render_text(ed.prompt.nwindow, &ed.prompt.text),
+                Some(ref text) => render_text(ed.prompt.nwindow, text, 0, 0),
+                None => render_text(ed.prompt.nwindow, &ed.prompt.text, 0, 0),
             };
         },
     };
 
     wnoutrefresh(ed.prompt.nwindow);
-}
-
-fn render_text(w: nc::WINDOW, text: &str) {
-    let mut column = 0;
-    for grapheme in unicode::graphemes(text, true) {
-        let size = unicode::width(grapheme);
-        wmove(w, 0, column);
-        waddstr(w, grapheme);
-        column += size as i32;
-    }
 }
 
 fn render_window(ed: &Editor) {
@@ -77,17 +67,10 @@ fn render_window(ed: &Editor) {
 
         let line = &contents[line_number as usize];
 
-        let mut column = 0;
-        for grapheme in unicode::graphemes(line, true) {
-            let size = unicode::width(grapheme);
-
-            if (column as usize) + size >= ed.window.width as usize {
-                break;
-            }
-
-            wmove(ed.window.nwindow, row, column);
-            waddstr(ed.window.nwindow, grapheme);
-            column += size as i32;
+        if unicode::width(line) <= ed.window.width as usize {
+            render_text(ed.window.nwindow, line, row, 0);
+        } else {
+            render_text_clipped(ed.window.nwindow, line, row, 0, ed.window.width);
         }
 
         row += 1;
@@ -102,8 +85,33 @@ fn render_window(ed: &Editor) {
     wnoutrefresh(ed.window.nwindow);
 }
 
+fn render_text(w: nc::WINDOW, text: &str, y: i32, x: i32) {
+    let mut column = x;
+    for grapheme in unicode::graphemes(text, true) {
+        column += render_grapheme(w, grapheme, y, column) as i32;
+    }
+}
+
+fn render_text_clipped(w: nc::WINDOW, text: &str, y: i32, x: i32, width: i32) {
+    let mut column = x;
+    for grapheme in unicode::graphemes(text, true) {
+        column += render_grapheme(w, grapheme, y, column) as i32;
+
+        if column >= width {
+            break;
+        }
+    }
+}
+
+fn render_grapheme(w: nc::WINDOW, grapheme: &str, y: i32, x: i32) -> usize {
+    wmove(w, y, x);
+    waddstr(w, grapheme);
+
+    unicode::width(grapheme)
+}
+
 fn waddstr(w: nc::WINDOW, s: &str) {
-    check(nc::waddstr(w, s));
+    nc::waddstr(w, s);
 }
 
 pub fn getmaxy() -> i32 {
