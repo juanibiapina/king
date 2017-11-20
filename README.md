@@ -1,15 +1,12 @@
 # King
 
-King is a prototype text editor. I built it in order to understand the basic problems involved with writing a text editor.
+King is a text editor project. The first milestone has been reached, where a prototype editor was built.
 
-As an outcome of this prototype, I have come up with a rough plan on what features I would like to have first and what are the main problems that I need to solve.
+The outcome of the prototype is a rough plan on what features are needed for a basic editor and what are the main problems that need to be solved.
 
-Possible next steps:
+The next milestone is making the editor stable (no crashes or bugs) and with basic editing functionality. This should be the first 1.0 release.
 
-- Separate view code from editor logic
-- Full UTF-8 support
-
-Non-goals:
+# Non-goals
 
 - Windows support
 - Non terminal GUI
