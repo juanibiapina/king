@@ -7,3 +7,4 @@ authors = ["Juan Ibiapina <juanibiapina@gmail.com>"]
 ncurses = "*"
 unicode-width = "*"
 unicode-segmentation = "*"
+libc = "*"

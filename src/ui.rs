@@ -16,7 +16,7 @@ pub fn init() {
 }
 
 pub fn finish() {
-    check(nc::endwin());
+    nc::endwin();
 }
 
 pub fn render(ed: &Editor) {
