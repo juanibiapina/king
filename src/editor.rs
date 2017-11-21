@@ -12,6 +12,7 @@ pub struct Editor {
     pub prompt: Prompt,
     pub window: Window,
     buffers: Vec<SharedBuffer>,
+    height: i32,
 }
 
 impl Editor {
@@ -26,6 +27,7 @@ impl Editor {
             window: window,
             running: true,
             buffers: vec![buffer.clone()],
+            height: height,
         };
 
         return editor;
@@ -37,6 +39,14 @@ impl Editor {
 
     pub fn display_error(&mut self, text: &str) {
         self.prompt.display_error(text);
+    }
+
+    pub fn get_cursor(&self) -> (i32, i32) {
+        match self.mode {
+            Mode::Normal => (self.window.cur_y, self.window.cur_x),
+            Mode::Insert => (self.window.cur_y, self.window.cur_x),
+            Mode::Prompt => (self.height - 1, self.prompt.cur_x as i32),
+        }
     }
 
     pub fn handle_key(&mut self, key: Key) -> Result<()> {

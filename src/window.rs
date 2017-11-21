@@ -87,11 +87,6 @@ impl Window {
         self.adjust_cursor();
     }
 
-    pub fn render_cursor(&self) {
-        ui::wmove(self.nwindow, self.cur_y, self.cur_x);
-        ui::wnoutrefresh(self.nwindow);
-    }
-
     pub fn get_buffer(&self) -> SharedBuffer {
         self.buffer.clone()
     }

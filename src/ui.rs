@@ -3,7 +3,6 @@ extern crate ncurses;
 use self::ncurses as nc;
 
 use editor::Editor;
-use mode::Mode;
 use unicode;
 
 pub fn init() {
@@ -23,13 +22,16 @@ pub fn render(ed: &Editor) {
     render_window(ed);
     render_prompt(ed);
 
-    match ed.mode {
-        Mode::Normal => ed.window.render_cursor(),
-        Mode::Insert => ed.window.render_cursor(),
-        Mode::Prompt => ed.prompt.render_cursor(),
-    }
+    let (cur_y, cur_x) = ed.get_cursor();
+
+    render_cursor(cur_y, cur_x);
 
     doupdate();
+}
+
+fn render_cursor(y: i32, x: i32) {
+    nc::mv(y, x);
+    nc::refresh();
 }
 
 fn render_prompt(ed: &Editor) {

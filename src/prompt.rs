@@ -46,11 +46,6 @@ impl Prompt {
         }
     }
 
-    pub fn render_cursor(&self) {
-        ui::wmove(self.nwindow, 0, self.cur_x as i32);
-        ui::wnoutrefresh(self.nwindow);
-    }
-
     pub fn start(&mut self, starting_char: char) {
         self.clear();
         self.add_char(starting_char);
