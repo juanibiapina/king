@@ -2,10 +2,13 @@ extern crate ncurses;
 
 use self::ncurses as nc;
 
+use std::env;
+
 use editor::Editor;
 use unicode;
 
 pub fn init() {
+    env::set_var("ESCDELAY", "20");
     nc::setlocale(nc::LcCategory::all, "");
     nc::initscr();
     check(nc::keypad(nc::stdscr(), true));
