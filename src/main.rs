@@ -28,7 +28,7 @@ fn main() {
 
     ui::init();
 
-    let mut editor = Editor::init(ui::getmaxy(), ui::getmaxx());
+    let mut editor = Editor::new(ui::getmaxy(), ui::getmaxx());
 
     ui::render(&editor);
 

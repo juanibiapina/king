@@ -16,21 +16,19 @@ pub struct Editor {
 }
 
 impl Editor {
-    pub fn init(height: i32, width: i32) -> Editor {
+    pub fn new(height: i32, width: i32) -> Editor {
         let buffer = create_buffer();
         let window = Window::new(height - 1, width, buffer.clone());
         let prompt = Prompt::new(height - 1);
 
-        let editor = Editor {
+        Editor {
             mode: Mode::Normal,
             prompt: prompt,
             window: window,
             running: true,
             buffers: vec![buffer.clone()],
             height: height,
-        };
-
-        return editor;
+        }
     }
 
     pub fn running(&self) -> bool {
