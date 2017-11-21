@@ -82,6 +82,7 @@ impl Editor {
             Key::Esc => self.cancel_prompt(),
             Key::Backspace => prompt::delete_char(self),
             Key::Enter => self.finish_prompt()?,
+            _ => {},
         };
 
         Ok(())

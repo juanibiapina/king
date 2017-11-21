@@ -9,6 +9,7 @@ pub enum Key {
     Esc,
     Backspace,
     Char(char),
+    Unknown,
 }
 
 pub fn read_key() -> Option<Key> {
@@ -18,7 +19,12 @@ pub fn read_key() -> Option<Key> {
                 27 => Some(Key::Esc),
                 13 => Some(Key::Enter),
                 127 => Some(Key::Backspace),
-                ic => Some(Key::Char(parse_char(ic))),
+                ic => {
+                    match parse_char(ic) {
+                        Some(c) => Some(Key::Char(c)),
+                        None => Some(Key::Unknown),
+                    }
+                }
             }
         },
         Some(nc::WchResult::KeyCode(_)) => None,
@@ -26,6 +32,6 @@ pub fn read_key() -> Option<Key> {
     }
 }
 
-fn parse_char(ic: u32) -> char {
-    char::from_u32(ic).unwrap()
+fn parse_char(ic: u32) -> Option<char> {
+    char::from_u32(ic)
 }
