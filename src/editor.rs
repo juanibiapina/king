@@ -12,7 +12,7 @@ pub struct Editor {
     pub prompt: Prompt,
     pub window: Window,
     buffers: Vec<SharedBuffer>,
-    height: i32,
+    pub height: i32,
 }
 
 impl Editor {

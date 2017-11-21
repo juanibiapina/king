@@ -1,10 +1,5 @@
-extern crate ncurses;
-
 use std::char;
 
-use self::ncurses as nc;
-
-use ui;
 use unicode;
 use editor::Editor;
 use mode::Mode;
@@ -13,7 +8,7 @@ pub struct Prompt {
     pub text: String,
     pub error: Option<String>,
     pub message: Option<String>,
-    pub nwindow: nc::WINDOW,
+    pub pos_y: i32,
     pub cur_x: usize,
 }
 
@@ -34,14 +29,11 @@ fn end(editor: &mut Editor) {
 
 impl Prompt {
     pub fn new(y: i32) -> Prompt {
-        let max_x = ui::getmaxx();
-        let nwindow = ui::newwin(1, max_x, y, 0);
-
         Prompt {
             text: "".to_owned(),
             error: None,
             message: None,
-            nwindow: nwindow,
+            pos_y: y,
             cur_x: 0,
         }
     }

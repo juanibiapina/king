@@ -19,40 +19,35 @@ pub fn finish() {
 }
 
 pub fn render(ed: &Editor) {
-    render_window(ed);
+    erase();
+
     render_prompt(ed);
+    render_window(ed);
 
     let (cur_y, cur_x) = ed.get_cursor();
 
     render_cursor(cur_y, cur_x);
 
-    doupdate();
+    nc::refresh();
 }
 
 fn render_cursor(y: i32, x: i32) {
     nc::mv(y, x);
-    nc::refresh();
 }
 
 fn render_prompt(ed: &Editor) {
-    werase(ed.prompt.nwindow);
-
     match ed.prompt.error {
-        Some(ref text) => render_text(ed.prompt.nwindow, text, 0, 0),
+        Some(ref text) => render_text(text, ed.prompt.pos_y, 0),
         None => {
             match ed.prompt.message {
-                Some(ref text) => render_text(ed.prompt.nwindow, text, 0, 0),
-                None => render_text(ed.prompt.nwindow, &ed.prompt.text, 0, 0),
+                Some(ref text) => render_text(text, ed.prompt.pos_y, 0),
+                None => render_text(&ed.prompt.text, ed.prompt.pos_y, 0),
             };
         },
     };
-
-    wnoutrefresh(ed.prompt.nwindow);
 }
 
 fn render_window(ed: &Editor) {
-    werase(ed.window.nwindow);
-
     let contents = &ed.window.buffer.borrow().contents;
 
     let mut row = 0;
@@ -70,34 +65,32 @@ fn render_window(ed: &Editor) {
         let line = &contents[line_number as usize];
 
         if unicode::width(line) <= ed.window.width as usize {
-            render_text(ed.window.nwindow, line, row, 0);
+            render_text(line, row, 0);
         } else {
-            render_text_clipped(ed.window.nwindow, line, row, 0, ed.window.width);
+            render_text_clipped(line, row, 0, ed.window.width);
         }
 
         row += 1;
     }
 
     while row < ed.window.height {
-        wmove(ed.window.nwindow, row, 0);
-        waddstr(ed.window.nwindow, "~");
+        mv(row, 0);
+        addstr("~");
         row += 1;
     }
-
-    wnoutrefresh(ed.window.nwindow);
 }
 
-fn render_text(w: nc::WINDOW, text: &str, y: i32, x: i32) {
+fn render_text(text: &str, y: i32, x: i32) {
     let mut column = x;
     for grapheme in unicode::graphemes(text, true) {
-        column += render_grapheme(w, grapheme, y, column) as i32;
+        column += render_grapheme(grapheme, y, column) as i32;
     }
 }
 
-fn render_text_clipped(w: nc::WINDOW, text: &str, y: i32, x: i32, width: i32) {
+fn render_text_clipped(text: &str, y: i32, x: i32, width: i32) {
     let mut column = x;
     for grapheme in unicode::graphemes(text, true) {
-        column += render_grapheme(w, grapheme, y, column) as i32;
+        column += render_grapheme(grapheme, y, column) as i32;
 
         if column >= width {
             break;
@@ -105,15 +98,15 @@ fn render_text_clipped(w: nc::WINDOW, text: &str, y: i32, x: i32, width: i32) {
     }
 }
 
-fn render_grapheme(w: nc::WINDOW, grapheme: &str, y: i32, x: i32) -> usize {
-    wmove(w, y, x);
-    waddstr(w, grapheme);
+fn render_grapheme(grapheme: &str, y: i32, x: i32) -> usize {
+    mv(y, x);
+    addstr(grapheme);
 
     unicode::width(grapheme)
 }
 
-fn waddstr(w: nc::WINDOW, s: &str) {
-    nc::waddstr(w, s);
+fn addstr(s: &str) {
+    nc::addstr(s);
 }
 
 pub fn getmaxy() -> i32 {
@@ -124,24 +117,16 @@ pub fn getmaxx() -> i32 {
     nc::getmaxx(nc::stdscr())
 }
 
-pub fn wmove(w: nc::WINDOW, y: i32, x: i32) {
-    check(nc::wmove(w, y, x));
+pub fn mv(y: i32, x: i32) {
+    check(nc::mv(y, x));
 }
 
 pub fn newwin(lines: i32, cols: i32, y: i32, x: i32) -> nc::WINDOW {
     nc::newwin(lines, cols, y, x)
 }
 
-pub fn wnoutrefresh(w: nc::WINDOW) {
-    check(nc::wnoutrefresh(w));
-}
-
-fn werase(w: nc::WINDOW) {
-    check(nc::werase(w));
-}
-
-fn doupdate() {
-    check(nc::doupdate());
+fn erase() {
+    check(nc::erase());
 }
 
 fn check(result: i32) {

@@ -1,16 +1,10 @@
-extern crate ncurses;
-
 use std::char;
 
-use self::ncurses as nc;
-
-use ui;
 use buffer::SharedBuffer;
 use unicode;
 
 pub struct Window {
     pub buffer: SharedBuffer,
-    pub nwindow: nc::WINDOW,
     pub scroll_pos: i32,
     pub cur_y: i32,
     pub cur_x: i32,
@@ -20,11 +14,8 @@ pub struct Window {
 
 impl Window {
     pub fn new(height: i32, width: i32, buffer: SharedBuffer) -> Window {
-        let nwindow = ui::newwin(height, width, 0, 0);
-
         Window {
             buffer: buffer,
-            nwindow: nwindow,
             scroll_pos: 0,
             cur_y: 0,
             cur_x: 0,
