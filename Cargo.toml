@@ -8,3 +8,7 @@ ncurses = "*"
 unicode-width = "*"
 unicode-segmentation = "*"
 libc = "*"
+
+[[bin]]
+name = "king"
+doc = false
