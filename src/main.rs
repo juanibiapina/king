@@ -30,6 +30,8 @@ fn main() {
 
     let mut editor = Editor::init(ui::getmaxy(), ui::getmaxx());
 
+    ui::render(&editor);
+
     while editor.running() {
         if let Some(key) = input::read_key() {
             if let Err(err) = editor.handle_key(key) {
