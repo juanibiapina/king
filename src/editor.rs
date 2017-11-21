@@ -81,6 +81,7 @@ impl Editor {
         match key {
             Key::Char(c) => self.window.add_char(c),
             Key::Esc => self.finish_insert(),
+            Key::Backspace => self.window.delete_char(),
             _ => {},
         };
 

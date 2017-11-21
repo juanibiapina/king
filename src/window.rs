@@ -113,4 +113,24 @@ impl Window {
 
         self.cur_x += unicode::width_char(c) as i32;
     }
+
+    pub fn delete_char(&mut self) {
+        let line_position = (self.scroll_pos + self.cur_y) as usize;
+        let col_position = self.cur_x as usize;
+
+        if self.cur_x == 0 {
+           if self.cur_y > 0 {
+               let prev_line = &self.buffer.borrow_mut().contents[line_position-1].clone();
+               self.cur_y -= 1;
+               self.cur_x = (prev_line.len() - 1) as i32;
+               return
+           } else {
+               return
+           }
+        }
+
+        let current_line = &mut self.buffer.borrow_mut().contents[line_position];
+        let c = current_line.remove(col_position - 1);
+        self.cur_x -= unicode::width_char(c) as i32;
+    }
 }
