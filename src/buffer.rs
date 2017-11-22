@@ -9,7 +9,7 @@ use error::{Error, Result};
 pub type SharedBuffer = Rc<RefCell<Buffer>>;
 
 pub struct Buffer {
-    filename: Option<String>,
+    pub filename: Option<String>,
     pub contents: Vec<String>,
 }
 

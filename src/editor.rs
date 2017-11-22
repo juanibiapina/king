@@ -11,7 +11,7 @@ pub struct Editor {
     running: bool,
     pub prompt: Prompt,
     pub window: Window,
-    buffers: Vec<SharedBuffer>,
+    pub buffers: Vec<SharedBuffer>,
     pub height: i32,
 }
 
