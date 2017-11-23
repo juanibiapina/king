@@ -3,6 +3,7 @@ mod prompt;
 mod command;
 mod buffer;
 mod window;
+mod mappings;
 
 pub mod mode;
 pub mod ui;

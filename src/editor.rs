@@ -1,10 +1,11 @@
 use error::Result;
 use input::Key;
-use prompt::{self, Prompt};
-use command::Command;
+use prompt::Prompt;
+use command::{self, Command};
 use buffer::{create_buffer, SharedBuffer};
 use mode::Mode;
 use window::Window;
+use mappings::Mappings;
 
 pub struct Editor {
     pub mode: Mode,
@@ -13,6 +14,9 @@ pub struct Editor {
     pub window: Window,
     pub buffers: Vec<SharedBuffer>,
     pub height: i32,
+    normal_mappings: Mappings,
+    insert_mappings: Mappings,
+    prompt_mappings: Mappings,
 }
 
 impl Editor {
@@ -21,18 +25,45 @@ impl Editor {
         let window = Window::new(height - 1, width, buffer.clone());
         let prompt = Prompt::new(height - 1);
 
-        Editor {
+        let mut ed = Editor {
             mode: Mode::Normal,
             prompt: prompt,
             window: window,
             running: true,
             buffers: vec![buffer.clone()],
             height: height,
-        }
+            normal_mappings: Mappings::new(),
+            insert_mappings: Mappings::new(),
+            prompt_mappings: Mappings::new(),
+        };
+
+        ed.add_mapping(Mode::Normal, Key::Char(':'), Command::EnterPrompt(':'));
+        ed.add_mapping(Mode::Normal, Key::Char('i'), Command::EnterInsert);
+        ed.add_mapping(Mode::Normal, Key::Char('h'), Command::MoveCursorLeft);
+        ed.add_mapping(Mode::Normal, Key::Char('j'), Command::MoveCursorDown);
+        ed.add_mapping(Mode::Normal, Key::Char('k'), Command::MoveCursorUp);
+        ed.add_mapping(Mode::Normal, Key::Char('l'), Command::MoveCursorRight);
+
+        ed.add_mapping(Mode::Insert, Key::Esc, Command::LeaveInsert);
+        ed.add_mapping(Mode::Insert, Key::Backspace, Command::DeleteCharBeforeCursor);
+
+        ed.add_mapping(Mode::Prompt, Key::Esc, Command::CancelPrompt);
+        ed.add_mapping(Mode::Prompt, Key::Enter, Command::RunPrompt);
+        ed.add_mapping(Mode::Prompt, Key::Backspace, Command::DeleteCharBeforeCursorInPrompt);
+
+        return ed;
     }
 
     pub fn running(&self) -> bool {
         self.running
+    }
+
+    pub fn add_mapping(&mut self, mode: Mode, key: Key, command: Command) {
+        match mode {
+            Mode::Normal => self.normal_mappings.insert(key, command),
+            Mode::Insert => self.insert_mappings.insert(key, command),
+            Mode::Prompt => self.prompt_mappings.insert(key, command),
+        }
     }
 
     pub fn display_error(&mut self, text: &str) {
@@ -56,53 +87,44 @@ impl Editor {
     }
 
     fn handle_key_normal(&mut self, key: Key) -> Result<()> {
-        match key {
-            Key::Char(c) => {
-                match c {
-                    ':' => self.switch_to_prompt(':'),
-                    'i' => self.switch_to_insert(),
-                    'h' => self.window.move_cursor(0, -1),
-                    'j' => self.window.move_cursor(1, 0),
-                    'k' => self.window.move_cursor(-1, 0),
-                    'l' => self.window.move_cursor(0, 1),
-                    _ => {},
-                };
-            },
-            _ => {},
-        };
-
-        Ok(())
+        match self.normal_mappings.get(&key).cloned() {
+            Some(ref command) => command::run(command, self),
+            None => Ok(()),
+        }
     }
 
     fn handle_key_prompt(&mut self, key: Key) -> Result<()> {
-        match key {
-            Key::Char(c) => self.prompt.add_char(c),
-            Key::Esc => self.cancel_prompt(),
-            Key::Backspace => prompt::delete_char(self),
-            Key::Enter => self.finish_prompt()?,
-            _ => {},
-        };
-
-        Ok(())
+        match self.prompt_mappings.get(&key).cloned() {
+            Some(ref command) => command::run(command, self),
+            None => {
+                match key {
+                    Key::Char(c) => self.prompt.add_char(c),
+                    _ => Ok(()),
+                }
+            },
+        }
     }
 
     fn handle_key_insert(&mut self, key: Key) -> Result<()> {
-        match key {
-            Key::Char(c) => self.window.add_char(c),
-            Key::Esc => self.finish_insert(),
-            Key::Backspace => self.window.delete_char(),
-            _ => {},
-        };
+        match self.insert_mappings.get(&key).cloned() {
+            Some(ref command) => command::run(command, self),
+            None => {
+                match key {
+                    Key::Char(c) => self.window.add_char(c),
+                    _ => Ok(()),
+                }
+            },
+        }
+    }
+
+    pub fn leave_insert(&mut self) -> Result<()> {
+        self.switch_to_normal();
+        self.window.adjust_cursor();
 
         Ok(())
     }
 
-    fn finish_insert(&mut self) {
-        self.switch_to_normal();
-        self.window.adjust_cursor();
-    }
-
-    fn finish_prompt(&mut self) -> Result<()> {
+    pub fn run_prompt(&mut self) -> Result<()> {
         self.switch_to_normal();
 
         let text = self.prompt.get_text();
@@ -114,40 +136,38 @@ impl Editor {
 
         let command = Command::parse(&text)?;
 
-        match command {
-            Command::Quit => self.exit()?,
-            Command::Write => self.write()?,
-            Command::Edit(filename) => self.edit(&filename)?,
-        };
+        command::run(&command, self)
+    }
+
+    pub fn cancel_prompt(&mut self) -> Result<()> {
+        self.switch_to_normal();
+        self.prompt.clear();
 
         Ok(())
     }
 
-    fn cancel_prompt(&mut self) {
-        self.switch_to_normal();
-        self.prompt.clear();
-    }
-
-    fn switch_to_prompt(&mut self, c: char) {
+    pub fn enter_prompt(&mut self, c: char) -> Result<()> {
         self.mode = Mode::Prompt;
-        self.prompt.start(c);
+        self.prompt.start(c)
     }
 
-    fn switch_to_insert(&mut self) {
+    pub fn enter_insert(&mut self) -> Result<()> {
         self.mode = Mode::Insert;
+
+        Ok(())
     }
 
     fn switch_to_normal(&mut self) {
         self.mode = Mode::Normal;
     }
 
-    fn exit(&mut self) -> Result<()> {
+    pub fn exit(&mut self) -> Result<()> {
         self.running = false;
 
         Ok(())
     }
 
-    fn write(&mut self) -> Result<()> {
+    pub fn write(&mut self) -> Result<()> {
         let buffer = self.window.get_buffer();
 
         buffer.borrow_mut().write()?;
@@ -155,7 +175,7 @@ impl Editor {
         Ok(())
     }
 
-    fn edit(&mut self, filename: &str) -> Result<()> {
+    pub fn edit(&mut self, filename: &str) -> Result<()> {
         let buffer;
 
         if self.window.is_fresh() {

@@ -1,5 +1,6 @@
 use std::char;
 
+use error::Result;
 use unicode;
 use editor::Editor;
 use mode::Mode;
@@ -12,7 +13,7 @@ pub struct Prompt {
     pub cur_x: usize,
 }
 
-pub fn delete_char(editor: &mut Editor) {
+pub fn delete_char(editor: &mut Editor) -> Result<()> {
     if let Some(c) = editor.prompt.text.pop() {
         editor.prompt.cur_x -= unicode::width_char(c);
     }
@@ -20,6 +21,8 @@ pub fn delete_char(editor: &mut Editor) {
     if editor.prompt.text.is_empty() {
         end(editor);
     }
+
+    Ok(())
 }
 
 fn end(editor: &mut Editor) {
@@ -38,9 +41,10 @@ impl Prompt {
         }
     }
 
-    pub fn start(&mut self, starting_char: char) {
+    pub fn start(&mut self, starting_char: char) -> Result<()> {
         self.clear();
-        self.add_char(starting_char);
+
+        self.add_char(starting_char)
     }
 
     pub fn get_text(&self) -> String {
@@ -62,8 +66,10 @@ impl Prompt {
         self.message = Some(text.to_owned());
     }
 
-    pub fn add_char(&mut self, c: char) {
+    pub fn add_char(&mut self, c: char) -> Result<()> {
         self.text.push(c);
         self.cur_x += unicode::width_char(c);
+
+        Ok(())
     }
 }

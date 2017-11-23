@@ -4,6 +4,7 @@ use self::ncurses as nc;
 
 use std::char;
 
+#[derive(PartialEq, Eq, Hash)]
 pub enum Key {
     Enter,
     Esc,

@@ -4,16 +4,13 @@ use king::editor::Editor;
 use king::input::Key;
 use king::mode::Mode;
 
+mod common;
+use common::input_text;
+
 fn editor() -> Editor {
     let mut ed = Editor::new(10, 10);
     ed.handle_key(Key::Char('i')).unwrap();
     return ed;
-}
-
-fn input_text(ed: &mut Editor, text: &str) {
-    for c in text.chars() {
-        ed.handle_key(Key::Char(c)).unwrap();
-    }
 }
 
 #[test]
@@ -35,10 +32,31 @@ fn entering_text_moves_the_cursor() {
 }
 
 #[test]
+fn entering_text_adds_the_text_to_the_buffer() {
+    let mut ed = editor();
+
+    input_text(&mut ed, "some text");
+
+    assert_eq!(ed.window.buffer.borrow().contents[0], "some text");
+}
+
+#[test]
 fn entering_wide_chars_moves_the_cursor() {
     let mut ed = editor();
 
-    input_text(&mut ed, "123😀abc");
+    input_text(&mut ed, "😀😀");
 
-    assert_eq!(ed.get_cursor(), (0, 8));
+    assert_eq!(ed.get_cursor(), (0, 4));
+}
+
+#[test]
+fn deleting_text_with_backspace() {
+    let mut ed = editor();
+
+    input_text(&mut ed, "some text");
+    ed.handle_key(Key::Backspace).unwrap();
+    ed.handle_key(Key::Backspace).unwrap();
+
+    assert_eq!(ed.get_cursor(), (0, 7));
+    assert_eq!(ed.window.buffer.borrow().contents[0], "some te");
 }

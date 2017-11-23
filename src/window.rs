@@ -1,5 +1,6 @@
 use std::char;
 
+use error::Result;
 use buffer::SharedBuffer;
 use unicode;
 
@@ -71,11 +72,13 @@ impl Window {
         }
     }
 
-    pub fn move_cursor(&mut self, offset_y: i32, offset_x: i32) {
+    pub fn move_cursor(&mut self, offset_y: i32, offset_x: i32) -> Result<()> {
         self.cur_y += offset_y;
         self.cur_x += offset_x;
 
         self.adjust_cursor();
+
+        Ok(())
     }
 
     pub fn get_buffer(&self) -> SharedBuffer {
@@ -86,7 +89,7 @@ impl Window {
         self.buffer = buffer;
     }
 
-    pub fn add_char(&mut self, c: char) {
+    pub fn add_char(&mut self, c: char) -> Result<()> {
         let current_line = &mut self.buffer.borrow_mut().contents[(self.scroll_pos + self.cur_y) as usize];
 
         if (self.cur_x as usize) >= unicode::width(&current_line) {
@@ -98,9 +101,11 @@ impl Window {
         }
 
         self.cur_x += unicode::width_char(c) as i32;
+
+        Ok(())
     }
 
-    pub fn delete_char(&mut self) {
+    pub fn delete_char(&mut self) -> Result<()> {
         let line_position = (self.scroll_pos + self.cur_y) as usize;
         let col_position = self.cur_x as usize;
 
@@ -109,14 +114,16 @@ impl Window {
                let prev_line = &self.buffer.borrow_mut().contents[line_position-1].clone();
                self.cur_y -= 1;
                self.cur_x = (prev_line.len() - 1) as i32;
-               return
+               return Ok(())
            } else {
-               return
+               return Ok(())
            }
         }
 
         let current_line = &mut self.buffer.borrow_mut().contents[line_position];
         let c = current_line.remove(col_position - 1);
         self.cur_x -= unicode::width_char(c) as i32;
+
+        Ok(())
     }
 }
