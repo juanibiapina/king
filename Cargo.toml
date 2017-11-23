@@ -4,10 +4,13 @@ version = "0.1.0"
 authors = ["Juan Ibiapina <juanibiapina@gmail.com>"]
 
 [dependencies]
-ncurses = "*"
 unicode-width = "*"
 unicode-segmentation = "*"
 libc = "*"
+
+[dependencies.ncurses]
+version = "*"
+features = ["wide"]
 
 [[bin]]
 name = "king"
