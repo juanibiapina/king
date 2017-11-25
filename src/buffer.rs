@@ -24,7 +24,7 @@ impl Buffer {
         })
     }
 
-    pub fn write(&mut self) -> Result<()> {
+    pub fn write(&self) -> Result<()> {
         match self.filename {
             Some(ref filename) => {
                 match File::create(filename) {
