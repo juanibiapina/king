@@ -35,5 +35,5 @@ fn initial_cursor_is_at_0_0() {
 fn starts_with_one_unnamed_buffer() {
     let ed = Editor::new(10, 10);
 
-    assert_eq!(ed.window().buffer.filename, None);
+    assert_eq!(ed.window().filename(), None);
 }

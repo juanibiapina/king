@@ -1,16 +1,33 @@
 use std::char;
+use std::cmp::min;
 
 use error::Result;
 use buffer::Buffer;
 use unicode;
 
 pub struct Window {
-    pub buffer: Buffer,
-    pub scroll_pos: i32,
+    buffer: Buffer,
+    scroll_pos: i32,
     pub cur_y: i32,
     pub cur_x: i32,
     height: i32,
     width: i32,
+}
+
+pub struct ContentView<'a> {
+    buffer: &'a Buffer,
+    height: i32,
+    vertical_offset: i32,
+}
+
+impl<'a> ContentView<'a> {
+    pub fn height(&self) -> i32 {
+        self.height
+    }
+
+    pub fn line(&self, i: i32) -> &str {
+        &self.buffer.contents[(i + self.vertical_offset) as usize]
+    }
 }
 
 impl Window {
@@ -27,6 +44,18 @@ impl Window {
 
     pub fn size(&self) -> (i32, i32) {
         (self.height, self.width)
+    }
+
+    pub fn filename(&self) -> Option<&String> {
+        self.buffer.filename.as_ref()
+    }
+
+    pub fn content_view(&self) -> ContentView {
+        ContentView {
+            buffer: &self.buffer,
+            height: min(self.height, self.buffer.contents.len() as i32),
+            vertical_offset: self.scroll_pos,
+        }
     }
 
     pub fn adjust_cursor(&mut self) {

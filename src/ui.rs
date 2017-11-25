@@ -53,7 +53,7 @@ fn render_prompt(ed: &Editor) {
 fn render_window(ed: &Editor) {
     let window = ed.window();
     let (height, width) = window.size();
-    let contents = &window.buffer.contents;
+    let content_view = window.content_view();
 
     let mut row = 0;
     loop {
@@ -61,13 +61,11 @@ fn render_window(ed: &Editor) {
             break;
         }
 
-        let line_number = row + window.scroll_pos;
-
-        if line_number >= contents.len() as i32 {
+        if row >= content_view.height() as i32 {
             break;
         }
 
-        let line = &contents[line_number as usize];
+        let line = content_view.line(row);
 
         if unicode::width(line) <= width as usize {
             render_text(line, row, 0);
