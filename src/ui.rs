@@ -51,15 +51,16 @@ fn render_prompt(ed: &Editor) {
 }
 
 fn render_window(ed: &Editor) {
-    let contents = &ed.window.buffer.borrow().contents;
+    let window = ed.window();
+    let contents = &window.buffer.borrow().contents;
 
     let mut row = 0;
     loop {
-        if row >= ed.window.height {
+        if row >= window.height {
             break;
         }
 
-        let line_number = row + ed.window.scroll_pos;
+        let line_number = row + window.scroll_pos;
 
         if line_number >= contents.len() as i32 {
             break;
@@ -67,16 +68,16 @@ fn render_window(ed: &Editor) {
 
         let line = &contents[line_number as usize];
 
-        if unicode::width(line) <= ed.window.width as usize {
+        if unicode::width(line) <= window.width as usize {
             render_text(line, row, 0);
         } else {
-            render_text_clipped(line, row, 0, ed.window.width);
+            render_text_clipped(line, row, 0, window.width);
         }
 
         row += 1;
     }
 
-    while row < ed.window.height {
+    while row < window.height {
         mv(row, 0);
         addstr("~");
         row += 1;
