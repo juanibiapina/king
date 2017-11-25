@@ -60,6 +60,10 @@ impl Editor {
         self.running
     }
 
+    pub fn window(&self) -> &Window {
+        &self.window
+    }
+
     pub fn size(&self) -> (i32, i32) {
         (self.height, self.width)
     }
