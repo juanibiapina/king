@@ -16,7 +16,7 @@ fn editing_a_file_that_exists() {
 
     assert_eq!(Mode::Normal, ed.mode);
     assert_eq!(ed.prompt.message, Some("\"tests/fixtures/file_with_contents\"".to_owned()));
-    assert_eq!(ed.window.buffer.borrow().contents[0], "line 1");
-    assert_eq!(ed.window.buffer.borrow().contents[1], "line 2");
-    assert_eq!(ed.window.buffer.borrow().contents[2], "line 3");
+    assert_eq!(ed.window.buffer.contents[0], "line 1");
+    assert_eq!(ed.window.buffer.contents[1], "line 2");
+    assert_eq!(ed.window.buffer.contents[2], "line 3");
 }

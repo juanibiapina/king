@@ -2,7 +2,7 @@ use error::Result;
 use input::Key;
 use prompt::Prompt;
 use command::Command;
-use buffer::create_buffer;
+use buffer::Buffer;
 use mode::Mode;
 use window::Window;
 use mappings::Mappings;
@@ -22,8 +22,7 @@ pub struct Editor {
 
 impl Editor {
     pub fn new(height: i32, width: i32) -> Editor {
-        let buffer = create_buffer();
-        let window = Window::new(height - 1, width, buffer.clone());
+        let window = Window::new(height - 1, width, Buffer::new());
         let prompt = Prompt::new(height - 1);
 
         let mut ed = Editor {
@@ -209,10 +208,10 @@ impl Editor {
     }
 
     fn edit(&mut self, filename: &str) -> Result<()> {
-        let buffer = create_buffer();
-        buffer.borrow_mut().load(filename)?;
+        let mut buffer = Buffer::new();
+        buffer.load(filename)?;
 
-        self.window.set_buffer(buffer.clone());
+        self.window.set_buffer(buffer);
 
         self.prompt.display_message(&format!("\"{}\"", &filename));
 

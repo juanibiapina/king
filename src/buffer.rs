@@ -1,20 +1,12 @@
 use std::io;
-use std::rc::Rc;
-use std::cell::RefCell;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write, BufWriter, ErrorKind};
 
 use error::{Error, Result};
 
-pub type SharedBuffer = Rc<RefCell<Buffer>>;
-
 pub struct Buffer {
     pub filename: Option<String>,
     pub contents: Vec<String>,
-}
-
-pub fn create_buffer() -> SharedBuffer {
-    Rc::new(RefCell::new(Buffer::new()))
 }
 
 impl Buffer {

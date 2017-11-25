@@ -52,7 +52,7 @@ fn render_prompt(ed: &Editor) {
 
 fn render_window(ed: &Editor) {
     let window = ed.window();
-    let contents = &window.buffer.borrow().contents;
+    let contents = &window.buffer.contents;
 
     let mut row = 0;
     loop {

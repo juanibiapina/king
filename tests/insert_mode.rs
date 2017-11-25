@@ -37,7 +37,7 @@ fn entering_text_adds_the_text_to_the_buffer() {
 
     input_text(&mut ed, "some text");
 
-    assert_eq!(ed.window.buffer.borrow().contents[0], "some text");
+    assert_eq!(ed.window.buffer.contents[0], "some text");
 }
 
 #[test]
@@ -58,5 +58,5 @@ fn deleting_text_with_backspace() {
     ed.handle_key(Key::Backspace).unwrap();
 
     assert_eq!(ed.get_cursor(), (0, 7));
-    assert_eq!(ed.window.buffer.borrow().contents[0], "some te");
+    assert_eq!(ed.window.buffer.contents[0], "some te");
 }

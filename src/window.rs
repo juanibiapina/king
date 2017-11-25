@@ -1,11 +1,11 @@
 use std::char;
 
 use error::Result;
-use buffer::SharedBuffer;
+use buffer::Buffer;
 use unicode;
 
 pub struct Window {
-    pub buffer: SharedBuffer,
+    pub buffer: Buffer,
     pub scroll_pos: i32,
     pub cur_y: i32,
     pub cur_x: i32,
@@ -14,7 +14,7 @@ pub struct Window {
 }
 
 impl Window {
-    pub fn new(height: i32, width: i32, buffer: SharedBuffer) -> Window {
+    pub fn new(height: i32, width: i32, buffer: Buffer) -> Window {
         Window {
             buffer: buffer,
             scroll_pos: 0,
@@ -26,11 +26,11 @@ impl Window {
     }
 
     pub fn is_fresh(&self) -> bool {
-        self.buffer.borrow().is_fresh()
+        self.buffer.is_fresh()
     }
 
     pub fn adjust_cursor(&mut self) {
-        let contents = &self.buffer.borrow().contents;
+        let contents = &self.buffer.contents;
         let contents_len = contents.len() as i32;
 
         if self.cur_y >= self.height {
@@ -82,15 +82,15 @@ impl Window {
     }
 
     pub fn write(&mut self) -> Result<()> {
-        self.buffer.borrow_mut().write()
+        self.buffer.write()
     }
 
-    pub fn set_buffer(&mut self, buffer: SharedBuffer) {
+    pub fn set_buffer(&mut self, buffer: Buffer) {
         self.buffer = buffer;
     }
 
     pub fn add_char(&mut self, c: char) -> Result<()> {
-        let current_line = &mut self.buffer.borrow_mut().contents[(self.scroll_pos + self.cur_y) as usize];
+        let current_line = &mut self.buffer.contents[(self.scroll_pos + self.cur_y) as usize];
 
         if (self.cur_x as usize) >= unicode::width(&current_line) {
             current_line.push(c);
@@ -111,7 +111,7 @@ impl Window {
 
         if self.cur_x == 0 {
            if self.cur_y > 0 {
-               let prev_line = &self.buffer.borrow_mut().contents[line_position-1].clone();
+               let prev_line = &self.buffer.contents[line_position-1].clone();
                self.cur_y -= 1;
                self.cur_x = (prev_line.len() - 1) as i32;
                return Ok(())
@@ -120,7 +120,7 @@ impl Window {
            }
         }
 
-        let current_line = &mut self.buffer.borrow_mut().contents[line_position];
+        let current_line = &mut self.buffer.contents[line_position];
         let c = current_line.remove(col_position - 1);
         self.cur_x -= unicode::width_char(c) as i32;
 
