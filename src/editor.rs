@@ -12,7 +12,7 @@ pub struct Editor {
     pub mode: Mode,
     running: bool,
     pub prompt: Prompt,
-    pub window: Window,
+    window: Window,
     height: i32,
     width: i32,
     normal_mappings: Mappings,
