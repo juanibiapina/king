@@ -52,11 +52,12 @@ fn render_prompt(ed: &Editor) {
 
 fn render_window(ed: &Editor) {
     let window = ed.window();
+    let (height, width) = window.size();
     let contents = &window.buffer.contents;
 
     let mut row = 0;
     loop {
-        if row >= window.height {
+        if row >= height {
             break;
         }
 
@@ -68,16 +69,16 @@ fn render_window(ed: &Editor) {
 
         let line = &contents[line_number as usize];
 
-        if unicode::width(line) <= window.width as usize {
+        if unicode::width(line) <= width as usize {
             render_text(line, row, 0);
         } else {
-            render_text_clipped(line, row, 0, window.width);
+            render_text_clipped(line, row, 0, width);
         }
 
         row += 1;
     }
 
-    while row < window.height {
+    while row < height {
         mv(row, 0);
         addstr("~");
         row += 1;

@@ -9,8 +9,8 @@ pub struct Window {
     pub scroll_pos: i32,
     pub cur_y: i32,
     pub cur_x: i32,
-    pub height: i32,
-    pub width: i32,
+    height: i32,
+    width: i32,
 }
 
 impl Window {
@@ -23,6 +23,10 @@ impl Window {
             height: height,
             width: width,
         }
+    }
+
+    pub fn size(&self) -> (i32, i32) {
+        (self.height, self.width)
     }
 
     pub fn adjust_cursor(&mut self) {
