@@ -1,7 +1,7 @@
 use error::Result;
 use input::Key;
-use prompt::Prompt;
-use command::{self, Command};
+use prompt::{self, Prompt};
+use command::Command;
 use buffer::{create_buffer, SharedBuffer};
 use mode::Mode;
 use window::Window;
@@ -98,14 +98,14 @@ impl Editor {
 
     fn handle_key_normal(&mut self, key: Key) -> Result<()> {
         match self.normal_mappings.get(&key).cloned() {
-            Some(ref command) => command::run(command, self),
+            Some(ref command) => self.run_command(command),
             None => Ok(()),
         }
     }
 
     fn handle_key_prompt(&mut self, key: Key) -> Result<()> {
         match self.prompt_mappings.get(&key).cloned() {
-            Some(ref command) => command::run(command, self),
+            Some(ref command) => self.run_command(command),
             None => {
                 match key {
                     Key::Char(c) => self.prompt.add_char(c),
@@ -117,7 +117,7 @@ impl Editor {
 
     fn handle_key_insert(&mut self, key: Key) -> Result<()> {
         match self.insert_mappings.get(&key).cloned() {
-            Some(ref command) => command::run(command, self),
+            Some(ref command) => self.run_command(command),
             None => {
                 match key {
                     Key::Char(c) => self.window.add_char(c),
@@ -127,14 +127,14 @@ impl Editor {
         }
     }
 
-    pub fn leave_insert(&mut self) -> Result<()> {
+    fn leave_insert(&mut self) -> Result<()> {
         self.switch_to_normal();
         self.window.adjust_cursor();
 
         Ok(())
     }
 
-    pub fn run_prompt(&mut self) -> Result<()> {
+    fn run_prompt(&mut self) -> Result<()> {
         self.switch_to_normal();
 
         let text = self.prompt.get_text();
@@ -146,22 +146,41 @@ impl Editor {
 
         let command = Command::parse(&text)?;
 
-        command::run(&command, self)
+        self.run_command(&command)
     }
 
-    pub fn cancel_prompt(&mut self) -> Result<()> {
+    fn run_command(&mut self, command: &Command) -> Result<()> {
+        match *command {
+            Command::Quit => self.exit(),
+            Command::Write => self.write(),
+            Command::Edit(ref filename) => self.edit(filename),
+            Command::EnterPrompt(c) => self.enter_prompt(c),
+            Command::CancelPrompt => self.cancel_prompt(),
+            Command::RunPrompt => self.run_prompt(),
+            Command::EnterInsert => self.enter_insert(),
+            Command::LeaveInsert => self.leave_insert(),
+            Command::DeleteCharBeforeCursor => self.window.delete_char(),
+            Command::DeleteCharBeforeCursorInPrompt => prompt::delete_char(self),
+            Command::MoveCursorLeft => self.window.move_cursor(0, -1),
+            Command::MoveCursorRight => self.window.move_cursor(0, 1),
+            Command::MoveCursorUp => self.window.move_cursor(-1, 0),
+            Command::MoveCursorDown => self.window.move_cursor(1, 0),
+        }
+    }
+
+    fn cancel_prompt(&mut self) -> Result<()> {
         self.switch_to_normal();
         self.prompt.clear();
 
         Ok(())
     }
 
-    pub fn enter_prompt(&mut self, c: char) -> Result<()> {
+    fn enter_prompt(&mut self, c: char) -> Result<()> {
         self.mode = Mode::Prompt;
         self.prompt.start(c)
     }
 
-    pub fn enter_insert(&mut self) -> Result<()> {
+    fn enter_insert(&mut self) -> Result<()> {
         self.mode = Mode::Insert;
 
         Ok(())
@@ -171,13 +190,13 @@ impl Editor {
         self.mode = Mode::Normal;
     }
 
-    pub fn exit(&mut self) -> Result<()> {
+    fn exit(&mut self) -> Result<()> {
         self.running = false;
 
         Ok(())
     }
 
-    pub fn write(&mut self) -> Result<()> {
+    fn write(&mut self) -> Result<()> {
         let buffer = self.window.get_buffer();
 
         buffer.borrow_mut().write()?;
@@ -185,7 +204,7 @@ impl Editor {
         Ok(())
     }
 
-    pub fn edit(&mut self, filename: &str) -> Result<()> {
+    fn edit(&mut self, filename: &str) -> Result<()> {
         let buffer = create_buffer();
         buffer.borrow_mut().load(filename)?;
 
