@@ -81,8 +81,8 @@ impl Window {
         Ok(())
     }
 
-    pub fn get_buffer(&self) -> SharedBuffer {
-        self.buffer.clone()
+    pub fn write(&mut self) -> Result<()> {
+        self.buffer.borrow_mut().write()
     }
 
     pub fn set_buffer(&mut self, buffer: SharedBuffer) {

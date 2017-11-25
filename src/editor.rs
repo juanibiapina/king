@@ -151,7 +151,7 @@ impl Editor {
     fn run_command(&mut self, command: &Command) -> Result<()> {
         match *command {
             Command::Quit => self.exit(),
-            Command::Write => self.write(),
+            Command::Write => self.window.write(),
             Command::Edit(ref filename) => self.edit(filename),
             Command::EnterPrompt(c) => self.enter_prompt(c),
             Command::CancelPrompt => self.cancel_prompt(),
@@ -204,14 +204,6 @@ impl Editor {
 
     fn exit(&mut self) -> Result<()> {
         self.running = false;
-
-        Ok(())
-    }
-
-    fn write(&mut self) -> Result<()> {
-        let buffer = self.window.get_buffer();
-
-        buffer.borrow_mut().write()?;
 
         Ok(())
     }
