@@ -17,6 +17,14 @@ pub fn init() {
     check(nc::nonl());
 }
 
+pub fn getmaxy() -> i32 {
+    nc::getmaxy(nc::stdscr())
+}
+
+pub fn getmaxx() -> i32 {
+    nc::getmaxx(nc::stdscr())
+}
+
 pub fn finish() {
     nc::endwin();
 }
@@ -112,20 +120,8 @@ fn addstr(s: &str) {
     nc::addstr(s);
 }
 
-pub fn getmaxy() -> i32 {
-    nc::getmaxy(nc::stdscr())
-}
-
-pub fn getmaxx() -> i32 {
-    nc::getmaxx(nc::stdscr())
-}
-
-pub fn mv(y: i32, x: i32) {
+fn mv(y: i32, x: i32) {
     check(nc::mv(y, x));
-}
-
-pub fn newwin(lines: i32, cols: i32, y: i32, x: i32) -> nc::WINDOW {
-    nc::newwin(lines, cols, y, x)
 }
 
 fn erase() {
