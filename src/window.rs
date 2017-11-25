@@ -120,6 +120,8 @@ impl Window {
 
     pub fn set_buffer(&mut self, buffer: Buffer) {
         self.buffer = buffer;
+        self.cur_y = 0;
+        self.cur_x = 0;
     }
 
     pub fn add_char(&mut self, c: char) -> Result<()> {

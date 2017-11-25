@@ -19,6 +19,19 @@ fn editing_a_file_that_exists() {
 }
 
 #[test]
+fn cursor_position_reset_when_editing_a_new_file() {
+    let mut ed = Editor::new(10, 10);
+
+    input_text(&mut ed, ":edit tests/fixtures/file_with_contents");
+    ed.handle_key(Key::Enter).unwrap();
+    ed.handle_key(Key::Char('j')).unwrap();
+    input_text(&mut ed, ":edit tests/fixtures/file2");
+    ed.handle_key(Key::Enter).unwrap();
+
+    assert_eq!(ed.cursor(), (0, 0));
+}
+
+#[test]
 fn when_content_fits_the_window() {
     let mut ed = Editor::new(10, 10);
 
