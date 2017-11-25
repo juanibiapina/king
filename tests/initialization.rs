@@ -35,6 +35,5 @@ fn initial_cursor_is_at_0_0() {
 fn starts_with_one_unnamed_buffer() {
     let ed = Editor::new(10, 10);
 
-    assert_eq!(ed.buffers.len(), 1);
-    assert_eq!(ed.buffers[0].borrow().filename, None);
+    assert_eq!(ed.buffer.borrow().filename, None);
 }

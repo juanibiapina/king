@@ -12,7 +12,7 @@ pub struct Editor {
     running: bool,
     pub prompt: Prompt,
     pub window: Window,
-    pub buffers: Vec<SharedBuffer>,
+    pub buffer: SharedBuffer,
     pub height: i32,
     normal_mappings: Mappings,
     insert_mappings: Mappings,
@@ -30,7 +30,7 @@ impl Editor {
             prompt: prompt,
             window: window,
             running: true,
-            buffers: vec![buffer.clone()],
+            buffer: buffer.clone(),
             height: height,
             normal_mappings: Mappings::new(),
             insert_mappings: Mappings::new(),
@@ -176,17 +176,9 @@ impl Editor {
     }
 
     pub fn edit(&mut self, filename: &str) -> Result<()> {
-        let buffer;
-
-        if self.window.is_fresh() {
-            buffer = self.window.get_buffer();
-        } else {
-            buffer = create_buffer();
-            self.buffers.push(buffer.clone());
-            self.window.set_buffer(buffer.clone());
-        }
-
+        let buffer = create_buffer();
         buffer.borrow_mut().load(filename)?;
+        self.window.set_buffer(buffer.clone());
 
         self.prompt.display_message(&format!("\"{}\"", &filename));
 
