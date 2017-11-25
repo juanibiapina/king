@@ -46,8 +46,8 @@ impl Window {
         (self.height, self.width)
     }
 
-    pub fn filename(&self) -> Option<&String> {
-        self.buffer.filename.as_ref()
+    pub fn filename(&self) -> Option<&str> {
+        self.buffer.filename.as_ref().map(|s| &s[..])
     }
 
     pub fn content_view(&self) -> ContentView {
