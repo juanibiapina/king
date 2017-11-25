@@ -47,7 +47,7 @@ impl Window {
     }
 
     pub fn filename(&self) -> Option<&str> {
-        self.buffer.filename.as_ref().map(|s| &s[..])
+        self.buffer.filename()
     }
 
     pub fn cursor(&self) -> (i32, i32) {

@@ -5,7 +5,7 @@ use std::io::{BufRead, BufReader, Write, BufWriter, ErrorKind};
 use error::{Error, Result};
 
 pub struct Buffer {
-    pub filename: Option<String>,
+    filename: Option<String>,
     pub contents: Vec<String>,
 }
 
@@ -22,6 +22,10 @@ impl Buffer {
             filename: Some(filename.to_owned()),
             contents: load_file(filename)?,
         })
+    }
+
+    pub fn filename(&self) -> Option<&str> {
+        self.filename.as_ref().map(|s| &s[..])
     }
 
     pub fn write(&self) -> Result<()> {
