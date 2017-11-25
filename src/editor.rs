@@ -13,7 +13,8 @@ pub struct Editor {
     pub prompt: Prompt,
     pub window: Window,
     pub buffer: SharedBuffer,
-    pub height: i32,
+    height: i32,
+    width: i32,
     normal_mappings: Mappings,
     insert_mappings: Mappings,
     prompt_mappings: Mappings,
@@ -32,6 +33,7 @@ impl Editor {
             running: true,
             buffer: buffer.clone(),
             height: height,
+            width: width,
             normal_mappings: Mappings::new(),
             insert_mappings: Mappings::new(),
             prompt_mappings: Mappings::new(),
@@ -56,6 +58,10 @@ impl Editor {
 
     pub fn running(&self) -> bool {
         self.running
+    }
+
+    pub fn size(&self) -> (i32, i32) {
+        (self.height, self.width)
     }
 
     pub fn add_mapping(&mut self, mode: Mode, key: Key, command: Command) {
@@ -178,6 +184,7 @@ impl Editor {
     pub fn edit(&mut self, filename: &str) -> Result<()> {
         let buffer = create_buffer();
         buffer.borrow_mut().load(filename)?;
+
         self.window.set_buffer(buffer.clone());
 
         self.prompt.display_message(&format!("\"{}\"", &filename));

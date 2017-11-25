@@ -14,7 +14,7 @@ fn starts_in_normal_mode() {
 fn starts_with_the_specified_dimentions() {
     let ed = Editor::new(25, 80);
 
-    assert_eq!(ed.height, 25);
+    assert_eq!(ed.size(), (25, 80));
 }
 
 #[test]
