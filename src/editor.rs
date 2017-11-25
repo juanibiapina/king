@@ -208,8 +208,7 @@ impl Editor {
     }
 
     fn edit(&mut self, filename: &str) -> Result<()> {
-        let mut buffer = Buffer::new();
-        buffer.load(filename)?;
+        let buffer = Buffer::for_file(filename)?;
 
         self.window.set_buffer(buffer);
 

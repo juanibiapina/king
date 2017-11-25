@@ -17,6 +17,13 @@ impl Buffer {
         }
     }
 
+    pub fn for_file(filename: &str) -> Result<Buffer> {
+        Ok(Buffer {
+            filename: Some(filename.to_owned()),
+            contents: load_file(filename)?,
+        })
+    }
+
     pub fn is_fresh(&self) -> bool {
         self.filename.is_none() && self.contents.len() == 1 && self.contents[0].is_empty()
     }
@@ -46,36 +53,28 @@ impl Buffer {
             None => return Err(Error::NoFileName),
         };
     }
+}
 
-    pub fn load(&mut self, filename: &str) -> Result<()> {
-        match File::open(filename) {
-            Ok(file) => {
-                let reader = BufReader::new(file);
-                match reader.lines().collect::<io::Result<Vec<_>>>() {
-                    Ok(lines) => {
-                        self.filename = Some(filename.to_owned());
-                        if lines.len() == 0 {
-                            self.contents = vec![String::new()];
-                        } else {
-                            self.contents = lines;
-                        }
-
-                        Ok(())
-                    },
-                    Err(err) => Err(Error::IoError(err)),
-                }
-            },
-            Err(err) => {
-                match err.kind() {
-                    ErrorKind::NotFound => {
-                        self.filename = Some(filename.to_owned());
-                        self.contents = vec![String::new()];
-
-                        Ok(())
-                    },
-                    _ => Err(Error::IoError(err)),
-                }
-            },
-        }
+fn load_file(filename: &str) -> Result<Vec<String>> {
+    match File::open(filename) {
+        Ok(file) => {
+            let reader = BufReader::new(file);
+            match reader.lines().collect::<io::Result<Vec<_>>>() {
+                Ok(lines) => {
+                    if lines.len() == 0 {
+                        Ok(vec![String::new()])
+                    } else {
+                        Ok(lines)
+                    }
+                },
+                Err(err) => Err(Error::IoError(err)),
+            }
+        },
+        Err(err) => {
+            match err.kind() {
+                ErrorKind::NotFound => Ok(vec![String::new()]),
+                _ => Err(Error::IoError(err)),
+            }
+        },
     }
 }
