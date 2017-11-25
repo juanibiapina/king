@@ -80,8 +80,8 @@ impl Editor {
 
     pub fn get_cursor(&self) -> (i32, i32) {
         match self.mode {
-            Mode::Normal => (self.window.cur_y, self.window.cur_x),
-            Mode::Insert => (self.window.cur_y, self.window.cur_x),
+            Mode::Normal => self.window.get_cursor(),
+            Mode::Insert => self.window.get_cursor(),
             Mode::Prompt => (self.height - 1, self.prompt.cur_x as i32),
         }
     }

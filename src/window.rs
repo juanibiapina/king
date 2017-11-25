@@ -8,8 +8,8 @@ use unicode;
 pub struct Window {
     buffer: Buffer,
     scroll_pos: i32,
-    pub cur_y: i32,
-    pub cur_x: i32,
+    cur_y: i32,
+    cur_x: i32,
     height: i32,
     width: i32,
 }
@@ -48,6 +48,10 @@ impl Window {
 
     pub fn filename(&self) -> Option<&str> {
         self.buffer.filename.as_ref().map(|s| &s[..])
+    }
+
+    pub fn get_cursor(&self) -> (i32, i32) {
+        (self.cur_y, self.cur_x)
     }
 
     pub fn content_view(&self) -> ContentView {
