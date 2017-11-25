@@ -50,7 +50,7 @@ impl Window {
         self.buffer.filename.as_ref().map(|s| &s[..])
     }
 
-    pub fn get_cursor(&self) -> (i32, i32) {
+    pub fn cursor(&self) -> (i32, i32) {
         (self.cur_y, self.cur_x)
     }
 

@@ -12,19 +12,19 @@ fn simple_navigation_with_hjkl() {
 
     input_text(&mut ed, ":edit tests/fixtures/file_with_contents");
     ed.handle_key(Key::Enter).unwrap();
-    assert_eq!(ed.get_cursor(), (0, 0));
+    assert_eq!(ed.cursor(), (0, 0));
 
     ed.handle_key(Key::Char('j')).unwrap();
-    assert_eq!(ed.get_cursor(), (1, 0));
+    assert_eq!(ed.cursor(), (1, 0));
 
     ed.handle_key(Key::Char('l')).unwrap();
-    assert_eq!(ed.get_cursor(), (1, 1));
+    assert_eq!(ed.cursor(), (1, 1));
 
     ed.handle_key(Key::Char('h')).unwrap();
-    assert_eq!(ed.get_cursor(), (1, 0));
+    assert_eq!(ed.cursor(), (1, 0));
 
     ed.handle_key(Key::Char('k')).unwrap();
-    assert_eq!(ed.get_cursor(), (0, 0));
+    assert_eq!(ed.cursor(), (0, 0));
 }
 
 #[test]
@@ -33,17 +33,17 @@ fn content_boundary_checks() {
 
     input_text(&mut ed, ":edit tests/fixtures/file_with_contents");
     ed.handle_key(Key::Enter).unwrap();
-    assert_eq!(ed.get_cursor(), (0, 0));
+    assert_eq!(ed.cursor(), (0, 0));
 
     input_text(&mut ed, "jjjj");
-    assert_eq!(ed.get_cursor(), (2, 0));
+    assert_eq!(ed.cursor(), (2, 0));
 
     input_text(&mut ed, "llllll");
-    assert_eq!(ed.get_cursor(), (2, 5));
+    assert_eq!(ed.cursor(), (2, 5));
 
     input_text(&mut ed, "hhhhhhhh");
-    assert_eq!(ed.get_cursor(), (2, 0));
+    assert_eq!(ed.cursor(), (2, 0));
 
     input_text(&mut ed, "kkkkk");
-    assert_eq!(ed.get_cursor(), (0, 0));
+    assert_eq!(ed.cursor(), (0, 0));
 }

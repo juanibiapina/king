@@ -28,7 +28,7 @@ fn starts_running() {
 fn initial_cursor_is_at_0_0() {
     let ed = Editor::new(10, 10);
 
-    assert_eq!(ed.get_cursor(), (0, 0));
+    assert_eq!(ed.cursor(), (0, 0));
 }
 
 #[test]

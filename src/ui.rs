@@ -27,7 +27,7 @@ pub fn render(ed: &Editor) {
     render_prompt(ed);
     render_window(ed);
 
-    let (cur_y, cur_x) = ed.get_cursor();
+    let (cur_y, cur_x) = ed.cursor();
 
     render_cursor(cur_y, cur_x);
 

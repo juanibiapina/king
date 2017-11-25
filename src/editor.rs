@@ -78,10 +78,10 @@ impl Editor {
         self.prompt.display_error(text);
     }
 
-    pub fn get_cursor(&self) -> (i32, i32) {
+    pub fn cursor(&self) -> (i32, i32) {
         match self.mode {
-            Mode::Normal => self.window.get_cursor(),
-            Mode::Insert => self.window.get_cursor(),
+            Mode::Normal => self.window.cursor(),
+            Mode::Insert => self.window.cursor(),
             Mode::Prompt => (self.height - 1, self.prompt.cur_x as i32),
         }
     }
