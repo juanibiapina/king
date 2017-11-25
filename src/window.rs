@@ -25,10 +25,6 @@ impl Window {
         }
     }
 
-    pub fn is_fresh(&self) -> bool {
-        self.buffer.is_fresh()
-    }
-
     pub fn adjust_cursor(&mut self) {
         let contents = &self.buffer.contents;
         let contents_len = contents.len() as i32;

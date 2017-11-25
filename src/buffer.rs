@@ -24,10 +24,6 @@ impl Buffer {
         })
     }
 
-    pub fn is_fresh(&self) -> bool {
-        self.filename.is_none() && self.contents.len() == 1 && self.contents[0].is_empty()
-    }
-
     pub fn write(&mut self) -> Result<()> {
         match self.filename {
             Some(ref filename) => {
