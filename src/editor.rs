@@ -2,7 +2,7 @@ use error::Result;
 use input::Key;
 use prompt::Prompt;
 use command::Command;
-use buffer::{create_buffer, SharedBuffer};
+use buffer::create_buffer;
 use mode::Mode;
 use window::Window;
 use mappings::Mappings;
@@ -13,7 +13,6 @@ pub struct Editor {
     running: bool,
     pub prompt: Prompt,
     pub window: Window,
-    pub buffer: SharedBuffer,
     height: i32,
     width: i32,
     normal_mappings: Mappings,
@@ -32,7 +31,6 @@ impl Editor {
             prompt: prompt,
             window: window,
             running: true,
-            buffer: buffer.clone(),
             height: height,
             width: width,
             normal_mappings: Mappings::new(),
