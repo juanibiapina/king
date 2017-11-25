@@ -1,11 +1,12 @@
 use error::Result;
 use input::Key;
-use prompt::{self, Prompt};
+use prompt::Prompt;
 use command::Command;
 use buffer::{create_buffer, SharedBuffer};
 use mode::Mode;
 use window::Window;
 use mappings::Mappings;
+use unicode;
 
 pub struct Editor {
     pub mode: Mode,
@@ -160,12 +161,25 @@ impl Editor {
             Command::EnterInsert => self.enter_insert(),
             Command::LeaveInsert => self.leave_insert(),
             Command::DeleteCharBeforeCursor => self.window.delete_char(),
-            Command::DeleteCharBeforeCursorInPrompt => prompt::delete_char(self),
+            Command::DeleteCharBeforeCursorInPrompt => self.delete_char_in_prompt(),
             Command::MoveCursorLeft => self.window.move_cursor(0, -1),
             Command::MoveCursorRight => self.window.move_cursor(0, 1),
             Command::MoveCursorUp => self.window.move_cursor(-1, 0),
             Command::MoveCursorDown => self.window.move_cursor(1, 0),
         }
+    }
+
+    fn delete_char_in_prompt(&mut self) -> Result<()> {
+        if let Some(c) = self.prompt.text.pop() {
+            self.prompt.cur_x -= unicode::width_char(c);
+        }
+
+        if self.prompt.text.is_empty() {
+            self.switch_to_normal();
+            self.prompt.clear();
+        }
+
+        Ok(())
     }
 
     fn cancel_prompt(&mut self) -> Result<()> {

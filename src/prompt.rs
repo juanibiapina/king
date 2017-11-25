@@ -2,8 +2,6 @@ use std::char;
 
 use error::Result;
 use unicode;
-use editor::Editor;
-use mode::Mode;
 
 pub struct Prompt {
     pub text: String,
@@ -11,23 +9,6 @@ pub struct Prompt {
     pub message: Option<String>,
     pub pos_y: i32,
     pub cur_x: usize,
-}
-
-pub fn delete_char(editor: &mut Editor) -> Result<()> {
-    if let Some(c) = editor.prompt.text.pop() {
-        editor.prompt.cur_x -= unicode::width_char(c);
-    }
-
-    if editor.prompt.text.is_empty() {
-        end(editor);
-    }
-
-    Ok(())
-}
-
-fn end(editor: &mut Editor) {
-    editor.mode = Mode::Normal;
-    editor.prompt.clear();
 }
 
 impl Prompt {
