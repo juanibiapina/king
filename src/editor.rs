@@ -9,7 +9,7 @@ use mappings::Mappings;
 use unicode;
 
 pub struct Editor {
-    pub mode: Mode,
+    mode: Mode,
     running: bool,
     pub prompt: Prompt,
     window: Window,
@@ -60,6 +60,10 @@ impl Editor {
 
     pub fn window(&self) -> &Window {
         &self.window
+    }
+
+    pub fn mode(&self) -> Mode {
+        self.mode
     }
 
     pub fn size(&self) -> (i32, i32) {

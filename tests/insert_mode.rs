@@ -19,7 +19,7 @@ fn escape_leaves_insert_mode() {
 
     ed.handle_key(Key::Esc).unwrap();
 
-    assert_eq!(ed.mode, Mode::Normal);
+    assert_eq!(ed.mode(), Mode::Normal);
 }
 
 #[test]

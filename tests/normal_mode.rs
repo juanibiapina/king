@@ -10,7 +10,7 @@ fn i_enters_insert_mode() {
 
     ed.handle_key(Key::Char('i')).unwrap();
 
-    assert_eq!(Mode::Insert, ed.mode);
+    assert_eq!(ed.mode(), Mode::Insert);
 }
 
 #[test]
@@ -19,5 +19,5 @@ fn enter_to_prompt_with_colon() {
 
     ed.handle_key(Key::Char(':')).unwrap();
 
-    assert_eq!(Mode::Prompt, ed.mode);
+    assert_eq!(ed.mode(), Mode::Prompt);
 }

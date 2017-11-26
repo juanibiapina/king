@@ -14,7 +14,7 @@ fn editing_a_file_that_exists() {
     input_text(&mut ed, ":edit tests/fixtures/file_with_contents");
     ed.handle_key(Key::Enter).unwrap();
 
-    assert_eq!(Mode::Normal, ed.mode);
+    assert_eq!(ed.mode(), Mode::Normal);
     assert_eq!(ed.prompt.message, Some("\"tests/fixtures/file_with_contents\"".to_owned()));
 }
 

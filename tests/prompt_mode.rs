@@ -34,7 +34,7 @@ fn deleting_last_character() {
     ed.handle_key(Key::Backspace).unwrap();
     ed.handle_key(Key::Backspace).unwrap();
 
-    assert_eq!(ed.mode, Mode::Normal);
+    assert_eq!(ed.mode(), Mode::Normal);
     assert_eq!(ed.prompt.text, "");
     assert_eq!(ed.prompt.error, None);
     assert_eq!(ed.prompt.message, None);
@@ -48,7 +48,7 @@ fn leave_prompt_with_escape() {
     ed.handle_key(Key::Char(':')).unwrap();
     ed.handle_key(Key::Esc).unwrap();
 
-    assert_eq!(ed.mode, Mode::Normal);
+    assert_eq!(ed.mode(), Mode::Normal);
     assert_eq!(ed.prompt.text, "");
     assert_eq!(ed.prompt.error, None);
     assert_eq!(ed.prompt.message, None);

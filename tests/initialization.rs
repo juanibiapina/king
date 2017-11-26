@@ -7,7 +7,7 @@ use king::mode::Mode;
 fn starts_in_normal_mode() {
     let ed = Editor::new(10, 10);
 
-    assert_eq!(ed.mode, Mode::Normal);
+    assert_eq!(ed.mode(), Mode::Normal);
 }
 
 #[test]
