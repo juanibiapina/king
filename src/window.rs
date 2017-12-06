@@ -108,8 +108,18 @@ impl Window {
     pub fn move_cursor(&mut self, offset_y: i32, offset_x: i32) -> Result<()> {
         self.cur_y += offset_y;
         self.cur_x += offset_x;
-
         self.adjust_cursor();
+
+        Ok(())
+    }
+
+    pub fn advance_cursor(&mut self) -> Result<()> {
+        let contents = &self.buffer.contents;
+        let line_len = unicode::width(&contents[(self.scroll_pos + self.cur_y) as usize]) as i32;
+
+        if line_len > 0 {
+            self.cur_x += 1;
+        }
 
         Ok(())
     }

@@ -39,6 +39,7 @@ impl Editor {
 
         ed.add_mapping(Mode::Normal, Key::Char(':'), Command::EnterPrompt(':'));
         ed.add_mapping(Mode::Normal, Key::Char('i'), Command::EnterInsert);
+        ed.add_mapping(Mode::Normal, Key::Char('a'), Command::EnterInsertAfterCursor);
         ed.add_mapping(Mode::Normal, Key::Char('h'), Command::MoveCursorLeft);
         ed.add_mapping(Mode::Normal, Key::Char('j'), Command::MoveCursorDown);
         ed.add_mapping(Mode::Normal, Key::Char('k'), Command::MoveCursorUp);
@@ -160,6 +161,7 @@ impl Editor {
             Command::CancelPrompt => self.cancel_prompt(),
             Command::RunPrompt => self.run_prompt(),
             Command::EnterInsert => self.enter_insert(),
+            Command::EnterInsertAfterCursor => self.enter_insert_after_cursor(),
             Command::LeaveInsert => self.leave_insert(),
             Command::DeleteCharBeforeCursor => self.window.delete_char(),
             Command::DeleteCharBeforeCursorInPrompt => self.delete_char_in_prompt(),
@@ -197,6 +199,13 @@ impl Editor {
 
     fn enter_insert(&mut self) -> Result<()> {
         self.mode = Mode::Insert;
+
+        Ok(())
+    }
+
+    fn enter_insert_after_cursor(&mut self) -> Result<()> {
+        self.mode = Mode::Insert;
+        self.window.advance_cursor()?;
 
         Ok(())
     }
