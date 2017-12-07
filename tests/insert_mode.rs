@@ -106,3 +106,12 @@ fn when_there_is_content_a_moves_the_cursor_forward() {
 
     assert_eq!(ed.window().content_view().line(0), "1234x");
 }
+
+#[test]
+fn o_opens_insert_mode_on_a_new_line() {
+    let mut ed = Editor::new(10, 10);
+
+    ed.handle_key(Key::Char('o')).unwrap();
+    assert_eq!(ed.mode(), Mode::Insert);
+    assert_eq!(ed.cursor(), (1, 0));
+}

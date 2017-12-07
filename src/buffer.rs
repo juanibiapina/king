@@ -28,6 +28,11 @@ impl Buffer {
         self.filename.as_ref().map(|s| &s[..])
     }
 
+    pub fn add_line_below(&mut self, pos: i32) -> Result<()> {
+        self.contents.insert((pos + 1) as usize, "".to_owned());
+        Ok(())
+    }
+
     pub fn write(&self) -> Result<()> {
         match self.filename {
             Some(ref filename) => {
