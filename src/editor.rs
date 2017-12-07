@@ -225,7 +225,7 @@ impl Editor {
     fn open_line_before(&mut self) -> Result<()> {
         self.mode = Mode::Insert;
         self.window.add_line_above()?;
-        self.window.move_cursor(0, 0)?;
+        self.window.set_cur_x(0);
 
         Ok(())
     }

@@ -54,6 +54,10 @@ impl Window {
         (self.cur_y, self.cur_x)
     }
 
+    pub fn set_cur_x(&mut self, x: i32) {
+        self.cur_x = x;
+    }
+
     pub fn content_view(&self) -> ContentView {
         ContentView {
             buffer: &self.buffer,
