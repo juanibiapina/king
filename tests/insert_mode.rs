@@ -108,10 +108,24 @@ fn when_there_is_content_a_moves_the_cursor_forward() {
 }
 
 #[test]
-fn o_opens_insert_mode_on_a_new_line() {
+fn o_opens_insert_mode_on_the_next_line() {
     let mut ed = Editor::new(10, 10);
 
     ed.handle_key(Key::Char('o')).unwrap();
     assert_eq!(ed.mode(), Mode::Insert);
     assert_eq!(ed.cursor(), (1, 0));
+}
+
+#[test]
+fn shift_o_opens_insert_mode_on_the_previous_line() {
+    let mut ed = Editor::new(10, 10);
+
+    ed.handle_key(Key::Char('i')).unwrap();
+    input_text(&mut ed, "1234");
+    ed.handle_key(Key::Esc).unwrap();
+    ed.handle_key(Key::Char('O')).unwrap();
+    assert_eq!(ed.mode(), Mode::Insert);
+    assert_eq!(ed.cursor(), (0, 0));
+    assert_eq!(ed.window().content_view().line(0), "");
+    assert_eq!(ed.window().content_view().line(1), "1234");
 }

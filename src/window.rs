@@ -125,7 +125,11 @@ impl Window {
     }
 
     pub fn add_line_below(&mut self) -> Result<()> {
-        self.buffer.add_line_below(self.cur_y)
+        self.buffer.add_line(self.cur_y + 1)
+    }
+
+    pub fn add_line_above(&mut self) -> Result<()> {
+        self.buffer.add_line(self.cur_y)
     }
 
     pub fn write(&mut self) -> Result<()> {

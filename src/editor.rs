@@ -41,6 +41,7 @@ impl Editor {
         ed.add_mapping(Mode::Normal, Key::Char('i'), Command::EnterInsert);
         ed.add_mapping(Mode::Normal, Key::Char('a'), Command::EnterInsertAfterCursor);
         ed.add_mapping(Mode::Normal, Key::Char('o'), Command::OpenLineAfter);
+        ed.add_mapping(Mode::Normal, Key::Char('O'), Command::OpenLineBefore);
         ed.add_mapping(Mode::Normal, Key::Char('h'), Command::MoveCursorLeft);
         ed.add_mapping(Mode::Normal, Key::Char('j'), Command::MoveCursorDown);
         ed.add_mapping(Mode::Normal, Key::Char('k'), Command::MoveCursorUp);
@@ -164,6 +165,7 @@ impl Editor {
             Command::EnterInsert => self.enter_insert(),
             Command::EnterInsertAfterCursor => self.enter_insert_after_cursor(),
             Command::OpenLineAfter => self.open_line_after(),
+            Command::OpenLineBefore => self.open_line_before(),
             Command::LeaveInsert => self.leave_insert(),
             Command::DeleteCharBeforeCursor => self.window.delete_char(),
             Command::DeleteCharBeforeCursorInPrompt => self.delete_char_in_prompt(),
@@ -216,6 +218,14 @@ impl Editor {
         self.mode = Mode::Insert;
         self.window.add_line_below()?;
         self.window.move_cursor(1, 0)?;
+
+        Ok(())
+    }
+
+    fn open_line_before(&mut self) -> Result<()> {
+        self.mode = Mode::Insert;
+        self.window.add_line_above()?;
+        self.window.move_cursor(0, 0)?;
 
         Ok(())
     }

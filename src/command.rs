@@ -11,6 +11,7 @@ pub enum Command {
     EnterInsert,
     EnterInsertAfterCursor,
     OpenLineAfter,
+    OpenLineBefore,
     LeaveInsert,
     DeleteCharBeforeCursor,
     DeleteCharBeforeCursorInPrompt,
