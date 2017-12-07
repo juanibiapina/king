@@ -33,6 +33,14 @@ impl Buffer {
         Ok(())
     }
 
+    pub fn line(&self, n: i32) -> &str {
+        &self.contents[n as usize]
+    }
+
+    pub fn len(&self) -> usize {
+        self.contents.len()
+    }
+
     pub fn write(&self) -> Result<()> {
         match self.filename {
             Some(ref filename) => {

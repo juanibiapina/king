@@ -26,7 +26,7 @@ impl<'a> ContentView<'a> {
     }
 
     pub fn line(&self, i: i32) -> &str {
-        &self.buffer.contents[(i + self.vertical_offset) as usize]
+        self.buffer.line(i + self.vertical_offset)
     }
 }
 
@@ -61,14 +61,13 @@ impl Window {
     pub fn content_view(&self) -> ContentView {
         ContentView {
             buffer: &self.buffer,
-            height: min(self.height, self.buffer.contents.len() as i32),
+            height: min(self.height, self.buffer.len() as i32),
             vertical_offset: self.scroll_pos,
         }
     }
 
     pub fn adjust_cursor(&mut self) {
-        let contents = &self.buffer.contents;
-        let contents_len = contents.len() as i32;
+        let contents_len = self.buffer.len() as i32;
 
         if self.cur_y >= self.height {
             self.cur_y = self.height - 1;
@@ -94,7 +93,7 @@ impl Window {
             self.cur_y = self.height - 1;
         }
 
-        let line_len = unicode::width(&contents[(self.scroll_pos + self.cur_y) as usize]) as i32;
+        let line_len = unicode::width(self.buffer.line(self.scroll_pos + self.cur_y)) as i32;
 
         if self.cur_x >= line_len {
             self.cur_x = line_len - 1;
@@ -118,8 +117,8 @@ impl Window {
     }
 
     pub fn advance_cursor(&mut self) -> Result<()> {
-        let contents = &self.buffer.contents;
-        let line_len = unicode::width(&contents[(self.scroll_pos + self.cur_y) as usize]) as i32;
+        let line = self.buffer.line(self.scroll_pos + self.cur_y);
+        let line_len = unicode::width(line) as i32;
 
         if line_len > 0 {
             self.cur_x += 1;
@@ -163,12 +162,12 @@ impl Window {
     }
 
     pub fn delete_char(&mut self) -> Result<()> {
-        let line_position = (self.scroll_pos + self.cur_y) as usize;
+        let line_position = self.scroll_pos + self.cur_y;
         let col_position = self.cur_x as usize;
 
         if self.cur_x == 0 {
            if self.cur_y > 0 {
-               let prev_line = &self.buffer.contents[line_position-1].clone();
+               let prev_line = &self.buffer.line(line_position - 1);
                self.cur_y -= 1;
                self.cur_x = (prev_line.len() - 1) as i32;
                return Ok(())
@@ -177,7 +176,7 @@ impl Window {
            }
         }
 
-        let current_line = &mut self.buffer.contents[line_position];
+        let current_line = &mut self.buffer.contents[line_position as usize];
         let c = current_line.remove(col_position - 1);
         self.cur_x -= unicode::width_char(c) as i32;
 
