@@ -28,6 +28,22 @@ fn simple_navigation_with_hjkl() {
 }
 
 #[test]
+fn navigating_over_emoticons() {
+    let mut ed = Editor::new(10, 10);
+
+    input_text(&mut ed, "i");
+    input_text(&mut ed, "a😀😀a");
+    ed.handle_key(Key::Esc).unwrap();
+    assert_eq!(ed.cursor(), (0, 5));
+
+    input_text(&mut ed, "h");
+    assert_eq!(ed.cursor(), (0, 3));
+
+    input_text(&mut ed, "h");
+    assert_eq!(ed.cursor(), (0, 1));
+}
+
+#[test]
 fn content_boundary_checks() {
     let mut ed = Editor::new(10, 10);
 

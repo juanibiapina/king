@@ -93,6 +93,7 @@ impl Window {
             self.cur_y = self.height - 1;
         }
 
+        let line = self.buffer.line(self.scroll_pos + self.cur_y);
         let line_len = unicode::width(self.buffer.line(self.scroll_pos + self.cur_y)) as i32;
 
         if self.cur_x >= line_len {
@@ -105,6 +106,27 @@ impl Window {
 
         if self.cur_x >= self.width {
             self.cur_x = self.width - 1;
+        }
+
+        if self.cur_x > 0 {
+            let mut current_column = 0;
+            for grapheme in unicode::graphemes(line, true) {
+                let size = unicode::width(grapheme) as i32;
+
+                if current_column + size < self.cur_x {
+                    current_column += size;
+                    continue;
+                }
+
+                if current_column + size == self.cur_x {
+                    break;
+                }
+
+                if current_column + size > self.cur_x {
+                    self.cur_x = current_column;
+                    break;
+                }
+            }
         }
     }
 
