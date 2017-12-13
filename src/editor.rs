@@ -135,7 +135,7 @@ impl Editor {
 
     fn leave_insert(&mut self) -> Result<()> {
         self.switch_to_normal();
-        self.window.adjust_cursor();
+        self.window.ensure_cursor_over_line();
 
         Ok(())
     }
@@ -215,6 +215,7 @@ impl Editor {
     fn open_line_after(&mut self) -> Result<()> {
         self.mode = Mode::Insert;
         self.window.add_line_below()?;
+        self.window.set_cur_x(0);
         self.window.move_cursor(Movement::Down)?;
 
         Ok(())

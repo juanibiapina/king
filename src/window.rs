@@ -81,83 +81,98 @@ impl Window {
         }
     }
 
-    pub fn adjust_cursor(&mut self) {
-        let contents_len = self.buffer.len() as i32;
-
-        if self.cur_y >= self.height {
-            self.cur_y = self.height - 1;
-
-            self.scroll_up();
-        }
-
-        if self.cur_y >= contents_len {
-            self.cur_y = contents_len - 1;
-        }
-
-        if self.cur_y < 0 {
-            self.cur_y = 0;
-
-            self.scroll_down();
-        }
-
-        if self.cur_y >= self.height {
-            self.cur_y = self.height - 1;
-        }
-
-        let line = self.buffer.line(self.scroll_pos + self.cur_y);
-        let line_len = unicode::width(line) as i32;
-
-        if self.cur_x >= line_len {
-            self.cur_x = line_len - 1;
-        }
-
-        if self.cur_x < 0 {
-            self.cur_x = 0;
-        }
-
-        if self.cur_x >= self.width {
-            self.cur_x = self.width - 1;
-        }
-
-        if self.cur_x > 0 {
-            let mut current_column = 0;
-            for grapheme in unicode::graphemes(line, true) {
-                let size = unicode::width(grapheme) as i32;
-
-                if current_column + size < self.cur_x {
-                    current_column += size;
-                    continue;
-                }
-
-                if current_column + size == self.cur_x {
-                    break;
-                }
-
-                if current_column + size > self.cur_x {
-                    self.cur_x = current_column;
-                    break;
-                }
+    pub fn ensure_cursor_over_line(&mut self) {
+        let line = self.buffer.line(self.cur_y + self.scroll_pos);
+        let line_width = unicode::width(line) as i32;
+        if self.cur_x >= line_width {
+            if let Some(ref grapheme) = self.grapheme_at(self.cur_y, line_width - 1) {
+                self.cur_x = line_width - (unicode::width(grapheme) as i32);
             }
         }
+    }
+
+    pub fn ensure_cursor_not_in_middle_of_widechar(&mut self) {
+        if let Some(ref grapheme) = self.grapheme_at(self.cur_y, self.cur_x) {
+            let size = unicode::width(grapheme) as i32;
+            if size > 1 {
+                self.cur_x -= size - 1;
+            }
+        }
+    }
+
+    fn grapheme_at(&self, y: i32, x: i32) -> Option<String> {
+        let line = self.buffer.line(y + self.scroll_pos);
+
+        if x >= unicode::width(line) as i32 || x < 0 {
+            return None;
+        }
+
+        let mut current_column = 0;
+        for grapheme in unicode::graphemes(line, true) {
+            let size = unicode::width(grapheme) as i32;
+
+            if current_column + size > x {
+                return Some(grapheme.to_owned());
+            }
+
+            current_column += size;
+        }
+
+        return None;
     }
 
     pub fn move_cursor(&mut self, movement: Movement) -> Result<()> {
         match movement {
             Movement::Left => {
-                self.cur_x -= 1;
+                if let Some(ref grapheme) = self.grapheme_at(self.cur_y, self.cur_x - 1) {
+                    self.cur_x -= unicode::width(grapheme) as i32;
+                }
             },
             Movement::Right => {
-                self.cur_x += 1;
+                if let Some(ref grapheme) = self.grapheme_at(self.cur_y, self.cur_x) {
+                    let size = unicode::width(grapheme) as i32;
+                    let line_width = unicode::width(self.buffer.line(self.cur_y + self.scroll_pos)) as i32;
+                    if self.cur_x + size < line_width {
+                        self.cur_x += size;
+
+                        if self.cur_x >= self.width {
+                            self.cur_x = self.width - 1;
+                        }
+                    }
+                }
+
             },
             Movement::Up => {
                 self.cur_y -= 1;
+
+                if self.cur_y < 0 {
+                    self.cur_y = 0;
+
+                    self.scroll_down();
+                }
+
+                self.ensure_cursor_over_line();
+                self.ensure_cursor_not_in_middle_of_widechar();
             },
             Movement::Down => {
                 self.cur_y += 1;
+
+                if self.cur_y >= self.height {
+                    self.cur_y = self.height - 1;
+
+                    self.scroll_up();
+                }
+
+                let contents_len = self.buffer.len() as i32;
+
+                if self.cur_y >= contents_len {
+                    self.cur_y = contents_len - 1;
+                }
+
+                self.ensure_cursor_over_line();
+                self.ensure_cursor_not_in_middle_of_widechar();
             },
         }
-
-        self.adjust_cursor();
 
         Ok(())
     }
@@ -212,14 +227,14 @@ impl Window {
         let col_position = self.cur_x as usize;
 
         if self.cur_x == 0 {
-           if self.cur_y > 0 {
-               let prev_line = &self.buffer.line(line_position - 1);
-               self.cur_y -= 1;
-               self.cur_x = (prev_line.len() - 1) as i32;
-               return Ok(())
-           } else {
-               return Ok(())
-           }
+            if self.cur_y > 0 {
+                let prev_line = &self.buffer.line(line_position - 1);
+                self.cur_y -= 1;
+                self.cur_x = (prev_line.len() - 1) as i32;
+                return Ok(())
+            } else {
+                return Ok(())
+            }
         }
 
         let current_line = &mut self.buffer.contents[line_position as usize];

@@ -13,13 +13,15 @@ fn editor() -> Editor {
     return ed;
 }
 
+
 #[test]
-fn escape_leaves_insert_mode() {
+fn enter_and_exit() {
     let mut ed = editor();
 
     ed.handle_key(Key::Esc).unwrap();
 
     assert_eq!(ed.mode(), Mode::Normal);
+    assert_eq!(ed.cursor(), (0, 0));
 }
 
 #[test]
@@ -110,6 +112,10 @@ fn when_there_is_content_a_moves_the_cursor_forward() {
 #[test]
 fn o_opens_insert_mode_on_the_next_line() {
     let mut ed = Editor::new(10, 10);
+
+    ed.handle_key(Key::Char('i')).unwrap();
+    input_text(&mut ed, "asdf");
+    ed.handle_key(Key::Esc).unwrap();
 
     ed.handle_key(Key::Char('o')).unwrap();
     assert_eq!(ed.mode(), Mode::Insert);
