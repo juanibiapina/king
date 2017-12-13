@@ -105,7 +105,7 @@ impl Window {
         }
 
         let line = self.buffer.line(self.scroll_pos + self.cur_y);
-        let line_len = unicode::width(self.buffer.line(self.scroll_pos + self.cur_y)) as i32;
+        let line_len = unicode::width(line) as i32;
 
         if self.cur_x >= line_len {
             self.cur_x = line_len - 1;
