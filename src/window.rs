@@ -67,15 +67,27 @@ impl Window {
         }
     }
 
+    fn scroll_up(&mut self) {
+        let contents_len = self.buffer.len() as i32;
+
+        if self.cur_y + self.scroll_pos < contents_len - 1 {
+            self.scroll_pos += 1;
+        }
+    }
+
+    fn scroll_down(&mut self) {
+        if self.scroll_pos > 0 {
+            self.scroll_pos -= 1;
+        }
+    }
+
     pub fn adjust_cursor(&mut self) {
         let contents_len = self.buffer.len() as i32;
 
         if self.cur_y >= self.height {
             self.cur_y = self.height - 1;
 
-            if self.cur_y + self.scroll_pos < contents_len - 1 {
-                self.scroll_pos += 1;
-            }
+            self.scroll_up();
         }
 
         if self.cur_y >= contents_len {
@@ -85,9 +97,7 @@ impl Window {
         if self.cur_y < 0 {
             self.cur_y = 0;
 
-            if self.scroll_pos > 0 {
-                self.scroll_pos -= 1;
-            }
+            self.scroll_down();
         }
 
         if self.cur_y >= self.height {
