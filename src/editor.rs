@@ -2,6 +2,7 @@ use error::Result;
 use input::Key;
 use prompt::Prompt;
 use command::Command;
+use movement::Movement;
 use buffer::Buffer;
 use mode::Mode;
 use window::Window;
@@ -42,10 +43,10 @@ impl Editor {
         ed.add_mapping(Mode::Normal, Key::Char('a'), Command::EnterInsertAfterCursor);
         ed.add_mapping(Mode::Normal, Key::Char('o'), Command::OpenLineAfter);
         ed.add_mapping(Mode::Normal, Key::Char('O'), Command::OpenLineBefore);
-        ed.add_mapping(Mode::Normal, Key::Char('h'), Command::MoveCursorLeft);
-        ed.add_mapping(Mode::Normal, Key::Char('j'), Command::MoveCursorDown);
-        ed.add_mapping(Mode::Normal, Key::Char('k'), Command::MoveCursorUp);
-        ed.add_mapping(Mode::Normal, Key::Char('l'), Command::MoveCursorRight);
+        ed.add_mapping(Mode::Normal, Key::Char('h'), Command::Movement(Movement::Left));
+        ed.add_mapping(Mode::Normal, Key::Char('j'), Command::Movement(Movement::Down));
+        ed.add_mapping(Mode::Normal, Key::Char('k'), Command::Movement(Movement::Up));
+        ed.add_mapping(Mode::Normal, Key::Char('l'), Command::Movement(Movement::Right));
 
         ed.add_mapping(Mode::Insert, Key::Esc, Command::LeaveInsert);
         ed.add_mapping(Mode::Insert, Key::Backspace, Command::DeleteCharBeforeCursor);
@@ -169,10 +170,7 @@ impl Editor {
             Command::LeaveInsert => self.leave_insert(),
             Command::DeleteCharBeforeCursor => self.window.delete_char(),
             Command::DeleteCharBeforeCursorInPrompt => self.delete_char_in_prompt(),
-            Command::MoveCursorLeft => self.window.move_cursor(0, -1),
-            Command::MoveCursorRight => self.window.move_cursor(0, 1),
-            Command::MoveCursorUp => self.window.move_cursor(-1, 0),
-            Command::MoveCursorDown => self.window.move_cursor(1, 0),
+            Command::Movement(movement) => self.window.move_cursor(movement),
         }
     }
 
@@ -217,7 +215,7 @@ impl Editor {
     fn open_line_after(&mut self) -> Result<()> {
         self.mode = Mode::Insert;
         self.window.add_line_below()?;
-        self.window.move_cursor(1, 0)?;
+        self.window.move_cursor(Movement::Down)?;
 
         Ok(())
     }

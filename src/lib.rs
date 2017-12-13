@@ -1,4 +1,5 @@
 mod unicode;
+mod movement;
 mod prompt;
 mod command;
 mod buffer;

@@ -1,5 +1,7 @@
 use error::{Error, Result};
 
+use movement::Movement;
+
 #[derive(Clone)]
 pub enum Command {
     Quit,
@@ -15,10 +17,7 @@ pub enum Command {
     LeaveInsert,
     DeleteCharBeforeCursor,
     DeleteCharBeforeCursorInPrompt,
-    MoveCursorLeft,
-    MoveCursorRight,
-    MoveCursorUp,
-    MoveCursorDown,
+    Movement(Movement),
 }
 
 impl Command {

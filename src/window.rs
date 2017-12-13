@@ -1,6 +1,7 @@
 use std::char;
 use std::cmp::min;
 
+use movement::Movement;
 use error::Result;
 use buffer::Buffer;
 use unicode;
@@ -130,9 +131,22 @@ impl Window {
         }
     }
 
-    pub fn move_cursor(&mut self, offset_y: i32, offset_x: i32) -> Result<()> {
-        self.cur_y += offset_y;
-        self.cur_x += offset_x;
+    pub fn move_cursor(&mut self, movement: Movement) -> Result<()> {
+        match movement {
+            Movement::Left => {
+                self.cur_x -= 1;
+            },
+            Movement::Right => {
+                self.cur_x += 1;
+            },
+            Movement::Up => {
+                self.cur_y -= 1;
+            },
+            Movement::Down => {
+                self.cur_y += 1;
+            },
+        }
+
         self.adjust_cursor();
 
         Ok(())
