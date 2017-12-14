@@ -223,19 +223,22 @@ impl Window {
     }
 
     pub fn delete_char(&mut self) -> Result<()> {
-        let line_position = self.scroll_pos + self.cur_y;
-        let col_position = self.cur_x as usize;
-
         if self.cur_x == 0 {
-            if self.cur_y > 0 {
-                let prev_line = &self.buffer.line(line_position - 1);
-                self.cur_y -= 1;
-                self.cur_x = (prev_line.len() - 1) as i32;
+            if self.cur_y == 0 {
                 return Ok(())
             } else {
+                let pos_x = unicode::width(self.buffer.line(self.cur_y - 1 + self.scroll_pos)) as i32;
+                self.buffer.join_lines(self.cur_y - 1 + self.scroll_pos)?;
+
+                self.cur_y -= 1;
+                self.cur_x = pos_x;
+
                 return Ok(())
             }
         }
+
+        let line_position = self.scroll_pos + self.cur_y;
+        let col_position = self.cur_x as usize;
 
         let current_line = &mut self.buffer.contents[line_position as usize];
         let c = current_line.remove(col_position - 1);

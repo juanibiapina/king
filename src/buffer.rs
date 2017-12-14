@@ -33,6 +33,13 @@ impl Buffer {
         Ok(())
     }
 
+    pub fn join_lines(&mut self, n: i32) -> Result<()> {
+        let i = n as usize;
+        let line = self.contents.remove(i + 1);
+        self.contents[i].push_str(&line);
+        Ok(())
+    }
+
     pub fn line(&self, n: i32) -> &str {
         &self.contents[n as usize]
     }

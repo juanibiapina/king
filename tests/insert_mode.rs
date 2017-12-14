@@ -64,6 +64,24 @@ fn deleting_text_with_backspace() {
 }
 
 #[test]
+fn deleting_lines_with_backspace() {
+    let mut ed = editor();
+
+    input_text(&mut ed, "12");
+    ed.handle_key(Key::Esc).unwrap();
+    input_text(&mut ed, "o");
+    input_text(&mut ed, "34");
+    ed.handle_key(Key::Esc).unwrap();
+    input_text(&mut ed, "h");
+    input_text(&mut ed, "i");
+    ed.handle_key(Key::Backspace).unwrap();
+
+    assert_eq!(ed.cursor(), (0, 2));
+    assert_eq!(ed.window().content_view().line(0), "1234");
+    assert_eq!(ed.window().content_view().height(), 1);
+}
+
+#[test]
 fn when_buffer_is_empty_i_enters_insert_mode() {
     let mut ed = Editor::new(10, 10);
 
