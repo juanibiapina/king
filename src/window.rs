@@ -124,9 +124,13 @@ impl Window {
     pub fn move_cursor(&mut self, movement: Movement) -> Result<()> {
         match movement {
             Movement::Left => {
-                if let Some(ref grapheme) = self.grapheme_at(self.cur_y, self.cur_x - 1) {
-                    self.cur_x -= unicode::width(grapheme) as i32;
+                self.cur_x -= 1;
+
+                if self.cur_x < 0 {
+                    self.cur_x = 0;
                 }
+
+                self.ensure_cursor_not_in_middle_of_widechar();
             },
             Movement::Right => {
                 if let Some(ref grapheme) = self.grapheme_at(self.cur_y, self.cur_x) {
