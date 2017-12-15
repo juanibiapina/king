@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::{BufRead, BufReader, Write, BufWriter, ErrorKind};
 
 use error::{Error, Result};
+use unicode;
 
 pub struct Buffer {
     filename: Option<String>,
@@ -31,6 +32,27 @@ impl Buffer {
     pub fn add_line(&mut self, pos: i32) -> Result<()> {
         self.contents.insert(pos as usize, "".to_owned());
         Ok(())
+    }
+
+    pub fn grapheme_at(&self, y: i32, x: i32) -> Option<String> {
+        let line = &self.contents[y as usize];
+
+        if x >= unicode::width(line) as i32 || x < 0 {
+            return None;
+        }
+
+        let mut current_column = 0;
+        for grapheme in unicode::graphemes(line, true) {
+            let size = unicode::width(grapheme) as i32;
+
+            if current_column + size > x {
+                return Some(grapheme.to_owned());
+            }
+
+            current_column += size;
+        }
+
+        return None;
     }
 
     pub fn join_lines(&mut self, n: i32) -> Result<()> {
