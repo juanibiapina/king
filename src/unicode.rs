@@ -12,7 +12,7 @@ pub fn width_char(c: char) -> usize {
     UnicodeWidthChar::width(c).unwrap_or(0)
 }
 
-pub fn graphemes<'a>(text: &'a str, is_extended: bool) -> Graphemes<'a> {
+pub fn graphemes(text: &str, is_extended: bool) -> Graphemes {
     UnicodeSegmentation::graphemes(text, is_extended)
 }
 

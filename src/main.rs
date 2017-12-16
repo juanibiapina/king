@@ -34,7 +34,7 @@ fn main() {
 
     while editor.running() {
         if let Some(key) = input::read_key() {
-            if let Err(err) = editor.handle_key(key) {
+            if let Err(err) = editor.handle_key(&key) {
                 editor.display_error(&error_message(err));
             }
         }

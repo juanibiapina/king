@@ -13,7 +13,7 @@ pub type Result<T> = result::Result<T, Error>;
 pub fn error_message(err: Error) -> String {
     match err {
         Error::CommandNotFound(name) => format!("Command not found: {}", name),
-        Error::NoFileName => format!("No file name given"),
+        Error::NoFileName => "No file name given".to_owned(),
         Error::IoError(io_error) => format!("IO error: {}", io_error),
     }
 }

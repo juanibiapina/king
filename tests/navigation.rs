@@ -11,19 +11,19 @@ fn simple_navigation_with_hjkl() {
     let mut ed = Editor::new(10, 10);
 
     input_text(&mut ed, ":edit tests/fixtures/file_with_contents");
-    ed.handle_key(Key::Enter).unwrap();
+    ed.handle_key(&Key::Enter).unwrap();
     assert_eq!(ed.cursor(), (0, 0));
 
-    ed.handle_key(Key::Char('j')).unwrap();
+    ed.handle_key(&Key::Char('j')).unwrap();
     assert_eq!(ed.cursor(), (1, 0));
 
-    ed.handle_key(Key::Char('l')).unwrap();
+    ed.handle_key(&Key::Char('l')).unwrap();
     assert_eq!(ed.cursor(), (1, 1));
 
-    ed.handle_key(Key::Char('h')).unwrap();
+    ed.handle_key(&Key::Char('h')).unwrap();
     assert_eq!(ed.cursor(), (1, 0));
 
-    ed.handle_key(Key::Char('k')).unwrap();
+    ed.handle_key(&Key::Char('k')).unwrap();
     assert_eq!(ed.cursor(), (0, 0));
 }
 
@@ -33,7 +33,7 @@ fn navigating_over_emoticons() {
 
     input_text(&mut ed, "i");
     input_text(&mut ed, "a😀😀a");
-    ed.handle_key(Key::Esc).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
     assert_eq!(ed.cursor(), (0, 5));
 
     input_text(&mut ed, "h");
@@ -55,7 +55,7 @@ fn boundary_when_line_ends_with_emoticon() {
 
     input_text(&mut ed, "i");
     input_text(&mut ed, "a😀😀");
-    ed.handle_key(Key::Esc).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
     assert_eq!(ed.cursor(), (0, 3));
 
     input_text(&mut ed, "l");
@@ -67,7 +67,7 @@ fn content_boundary_checks() {
     let mut ed = Editor::new(10, 10);
 
     input_text(&mut ed, ":edit tests/fixtures/file_with_contents");
-    ed.handle_key(Key::Enter).unwrap();
+    ed.handle_key(&Key::Enter).unwrap();
     assert_eq!(ed.cursor(), (0, 0));
 
     input_text(&mut ed, "jjjj");
@@ -87,12 +87,12 @@ fn content_boundary_checks() {
 fn moving_up_to_shorter_line() {
     let mut ed = Editor::new(10, 10);
 
-    ed.handle_key(Key::Char('i')).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
     input_text(&mut ed, "12");
-    ed.handle_key(Key::Esc).unwrap();
-    ed.handle_key(Key::Char('o')).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
+    ed.handle_key(&Key::Char('o')).unwrap();
     input_text(&mut ed, "1234");
-    ed.handle_key(Key::Esc).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
 
     input_text(&mut ed, "k");
     assert_eq!(ed.cursor(), (0, 1));
@@ -102,12 +102,12 @@ fn moving_up_to_shorter_line() {
 fn moving_down_to_shorter_line() {
     let mut ed = Editor::new(10, 10);
 
-    ed.handle_key(Key::Char('i')).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
     input_text(&mut ed, "1234");
-    ed.handle_key(Key::Esc).unwrap();
-    ed.handle_key(Key::Char('o')).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
+    ed.handle_key(&Key::Char('o')).unwrap();
     input_text(&mut ed, "12");
-    ed.handle_key(Key::Esc).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
 
     input_text(&mut ed, "kllj");
     assert_eq!(ed.cursor(), (1, 1));
@@ -117,12 +117,12 @@ fn moving_down_to_shorter_line() {
 fn moving_up_to_middle_of_emoticon() {
     let mut ed = Editor::new(10, 10);
 
-    ed.handle_key(Key::Char('i')).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
     input_text(&mut ed, "12😀");
-    ed.handle_key(Key::Esc).unwrap();
-    ed.handle_key(Key::Char('o')).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
+    ed.handle_key(&Key::Char('o')).unwrap();
     input_text(&mut ed, "1234");
-    ed.handle_key(Key::Esc).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
 
     input_text(&mut ed, "k");
     assert_eq!(ed.cursor(), (0, 2));
@@ -132,12 +132,12 @@ fn moving_up_to_middle_of_emoticon() {
 fn moving_down_to_middle_of_emoticon() {
     let mut ed = Editor::new(10, 10);
 
-    ed.handle_key(Key::Char('i')).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
     input_text(&mut ed, "1234");
-    ed.handle_key(Key::Esc).unwrap();
-    ed.handle_key(Key::Char('o')).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
+    ed.handle_key(&Key::Char('o')).unwrap();
     input_text(&mut ed, "12😀");
-    ed.handle_key(Key::Esc).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
 
     input_text(&mut ed, "klj");
     assert_eq!(ed.cursor(), (1, 2));

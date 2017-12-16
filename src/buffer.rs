@@ -10,6 +10,12 @@ pub struct Buffer {
     pub contents: Vec<String>,
 }
 
+impl Default for Buffer {
+    fn default() -> Buffer {
+        Buffer::new()
+    }
+}
+
 impl Buffer {
     pub fn new() -> Buffer {
         Buffer {
@@ -52,7 +58,7 @@ impl Buffer {
             current_column += size;
         }
 
-        return None;
+        None
     }
 
     pub fn join_lines(&mut self, n: i32) -> Result<()> {
@@ -81,19 +87,19 @@ impl Buffer {
                                 Ok(_) => {},
                                 Err(err) => return Err(Error::IoError(err)),
                             };
-                            match writer.write("\n".as_bytes()) {
+                            match writer.write(b"\n") {
                                 Ok(_) => {},
                                 Err(err) => return Err(Error::IoError(err)),
                             };
                         }
 
-                        return Ok(());
+                        Ok(())
                     },
-                    Err(err) => return Err(Error::IoError(err)),
+                    Err(err) => Err(Error::IoError(err)),
                 }
             },
-            None => return Err(Error::NoFileName),
-        };
+            None => Err(Error::NoFileName),
+        }
     }
 }
 
@@ -103,7 +109,7 @@ fn load_file(filename: &str) -> Result<Vec<String>> {
             let reader = BufReader::new(file);
             match reader.lines().collect::<io::Result<Vec<_>>>() {
                 Ok(lines) => {
-                    if lines.len() == 0 {
+                    if lines.is_empty() {
                         Ok(vec![String::new()])
                     } else {
                         Ok(lines)

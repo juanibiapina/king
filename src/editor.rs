@@ -55,7 +55,7 @@ impl Editor {
         ed.add_mapping(Mode::Prompt, Key::Enter, Command::RunPrompt);
         ed.add_mapping(Mode::Prompt, Key::Backspace, Command::DeleteCharBeforeCursorInPrompt);
 
-        return ed;
+        ed
     }
 
     pub fn running(&self) -> bool {
@@ -88,13 +88,12 @@ impl Editor {
 
     pub fn cursor(&self) -> (i32, i32) {
         match self.mode {
-            Mode::Normal => self.window.cursor(),
-            Mode::Insert => self.window.cursor(),
+            Mode::Normal | Mode::Insert => self.window.cursor(),
             Mode::Prompt => (self.height - 1, self.prompt.cur_x as i32),
         }
     }
 
-    pub fn handle_key(&mut self, key: Key) -> Result<()> {
+    pub fn handle_key(&mut self, key: &Key) -> Result<()> {
         match self.mode {
             Mode::Normal => self.handle_key_normal(key),
             Mode::Insert => self.handle_key_insert(key),
@@ -102,18 +101,18 @@ impl Editor {
         }
     }
 
-    fn handle_key_normal(&mut self, key: Key) -> Result<()> {
-        match self.normal_mappings.get(&key).cloned() {
+    fn handle_key_normal(&mut self, key: &Key) -> Result<()> {
+        match self.normal_mappings.get(key).cloned() {
             Some(ref command) => self.run_command(command),
             None => Ok(()),
         }
     }
 
-    fn handle_key_prompt(&mut self, key: Key) -> Result<()> {
-        match self.prompt_mappings.get(&key).cloned() {
+    fn handle_key_prompt(&mut self, key: &Key) -> Result<()> {
+        match self.prompt_mappings.get(key).cloned() {
             Some(ref command) => self.run_command(command),
             None => {
-                match key {
+                match *key {
                     Key::Char(c) => self.prompt.add_char(c),
                     _ => Ok(()),
                 }
@@ -121,11 +120,11 @@ impl Editor {
         }
     }
 
-    fn handle_key_insert(&mut self, key: Key) -> Result<()> {
-        match self.insert_mappings.get(&key).cloned() {
+    fn handle_key_insert(&mut self, key: &Key) -> Result<()> {
+        match self.insert_mappings.get(key).cloned() {
             Some(ref command) => self.run_command(command),
             None => {
-                match key {
+                match *key {
                     Key::Char(c) => self.window.add_char(c),
                     _ => Ok(()),
                 }

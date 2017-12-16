@@ -9,8 +9,8 @@ use common::input_text;
 
 fn editor() -> Editor {
     let mut ed = Editor::new(10, 10);
-    ed.handle_key(Key::Char('i')).unwrap();
-    return ed;
+    ed.handle_key(&Key::Char('i')).unwrap();
+    ed
 }
 
 
@@ -18,7 +18,7 @@ fn editor() -> Editor {
 fn enter_and_exit() {
     let mut ed = editor();
 
-    ed.handle_key(Key::Esc).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
 
     assert_eq!(ed.mode(), Mode::Normal);
     assert_eq!(ed.cursor(), (0, 0));
@@ -56,8 +56,8 @@ fn deleting_text_with_backspace() {
     let mut ed = editor();
 
     input_text(&mut ed, "some text");
-    ed.handle_key(Key::Backspace).unwrap();
-    ed.handle_key(Key::Backspace).unwrap();
+    ed.handle_key(&Key::Backspace).unwrap();
+    ed.handle_key(&Key::Backspace).unwrap();
 
     assert_eq!(ed.cursor(), (0, 7));
     assert_eq!(ed.window().content_view().line(0), "some te");
@@ -68,13 +68,13 @@ fn deleting_lines_with_backspace() {
     let mut ed = editor();
 
     input_text(&mut ed, "12");
-    ed.handle_key(Key::Esc).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
     input_text(&mut ed, "o");
     input_text(&mut ed, "34");
-    ed.handle_key(Key::Esc).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
     input_text(&mut ed, "h");
     input_text(&mut ed, "i");
-    ed.handle_key(Key::Backspace).unwrap();
+    ed.handle_key(&Key::Backspace).unwrap();
 
     assert_eq!(ed.cursor(), (0, 2));
     assert_eq!(ed.window().content_view().line(0), "1234");
@@ -85,7 +85,7 @@ fn deleting_lines_with_backspace() {
 fn when_buffer_is_empty_i_enters_insert_mode() {
     let mut ed = Editor::new(10, 10);
 
-    ed.handle_key(Key::Char('i')).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
 
     assert_eq!(ed.mode(), Mode::Insert);
     assert_eq!(ed.cursor(), (0, 0));
@@ -95,10 +95,10 @@ fn when_buffer_is_empty_i_enters_insert_mode() {
 fn when_there_is_content_i_does_not_move_the_cursor() {
     let mut ed = Editor::new(10, 10);
 
-    ed.handle_key(Key::Char('i')).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
     input_text(&mut ed, "1234");
-    ed.handle_key(Key::Esc).unwrap();
-    ed.handle_key(Key::Char('i')).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
     input_text(&mut ed, "x");
 
     assert_eq!(ed.window().content_view().line(0), "123x4");
@@ -108,7 +108,7 @@ fn when_there_is_content_i_does_not_move_the_cursor() {
 fn when_buffer_is_empty_a_enters_insert_mode() {
     let mut ed = Editor::new(10, 10);
 
-    ed.handle_key(Key::Char('a')).unwrap();
+    ed.handle_key(&Key::Char('a')).unwrap();
 
     assert_eq!(ed.mode(), Mode::Insert);
     assert_eq!(ed.cursor(), (0, 0));
@@ -118,10 +118,10 @@ fn when_buffer_is_empty_a_enters_insert_mode() {
 fn when_there_is_content_a_moves_the_cursor_forward() {
     let mut ed = Editor::new(10, 10);
 
-    ed.handle_key(Key::Char('a')).unwrap();
+    ed.handle_key(&Key::Char('a')).unwrap();
     input_text(&mut ed, "1234");
-    ed.handle_key(Key::Esc).unwrap();
-    ed.handle_key(Key::Char('a')).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
+    ed.handle_key(&Key::Char('a')).unwrap();
     input_text(&mut ed, "x");
 
     assert_eq!(ed.window().content_view().line(0), "1234x");
@@ -131,11 +131,11 @@ fn when_there_is_content_a_moves_the_cursor_forward() {
 fn o_opens_insert_mode_on_the_next_line() {
     let mut ed = Editor::new(10, 10);
 
-    ed.handle_key(Key::Char('i')).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
     input_text(&mut ed, "asdf");
-    ed.handle_key(Key::Esc).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
 
-    ed.handle_key(Key::Char('o')).unwrap();
+    ed.handle_key(&Key::Char('o')).unwrap();
     assert_eq!(ed.mode(), Mode::Insert);
     assert_eq!(ed.cursor(), (1, 0));
 }
@@ -144,10 +144,10 @@ fn o_opens_insert_mode_on_the_next_line() {
 fn shift_o_opens_insert_mode_on_the_previous_line() {
     let mut ed = Editor::new(10, 10);
 
-    ed.handle_key(Key::Char('i')).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
     input_text(&mut ed, "1234");
-    ed.handle_key(Key::Esc).unwrap();
-    ed.handle_key(Key::Char('O')).unwrap();
+    ed.handle_key(&Key::Esc).unwrap();
+    ed.handle_key(&Key::Char('O')).unwrap();
     assert_eq!(ed.mode(), Mode::Insert);
     assert_eq!(ed.cursor(), (0, 0));
     assert_eq!(ed.window().content_view().line(0), "");

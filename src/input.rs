@@ -28,8 +28,7 @@ pub fn read_key() -> Option<Key> {
                 }
             }
         },
-        Some(nc::WchResult::KeyCode(_)) => None,
-        None => None,
+        Some(nc::WchResult::KeyCode(_)) | None => None,
     }
 }
 

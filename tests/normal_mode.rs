@@ -8,7 +8,7 @@ use king::mode::Mode;
 fn enter_to_prompt_with_colon() {
     let mut ed = Editor::new(10, 10);
 
-    ed.handle_key(Key::Char(':')).unwrap();
+    ed.handle_key(&Key::Char(':')).unwrap();
 
     assert_eq!(ed.mode(), Mode::Prompt);
 }

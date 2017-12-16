@@ -11,7 +11,7 @@ fn vertical_scroll() {
     let mut ed = Editor::new(3, 3);
 
     input_text(&mut ed, ":edit tests/fixtures/file_with_contents");
-    ed.handle_key(Key::Enter).unwrap();
+    ed.handle_key(&Key::Enter).unwrap();
     assert_eq!(ed.cursor(), (0, 0));
     assert_eq!(ed.window().content_view().line(0), "line 1");
 
