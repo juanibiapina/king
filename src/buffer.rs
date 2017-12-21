@@ -7,7 +7,7 @@ use unicode;
 
 pub struct Buffer {
     filename: Option<String>,
-    pub contents: Vec<String>,
+    contents: Vec<String>,
 }
 
 impl Default for Buffer {
@@ -80,6 +80,10 @@ impl Buffer {
 
     pub fn line(&self, n: i32) -> &str {
         &self.contents[n as usize]
+    }
+
+    pub fn line_mut(&mut self, n: i32) -> &mut String {
+        &mut self.contents[n as usize]
     }
 
     pub fn len(&self) -> usize {

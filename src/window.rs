@@ -191,11 +191,11 @@ impl Window {
 
     pub fn add_char(&mut self, c: char) -> Result<()> {
         if (self.cur_x as usize) >= unicode::width(self.buffer.line(self.scroll_pos + self.cur_y)) {
-            let current_line = &mut self.buffer.contents[(self.scroll_pos + self.cur_y) as usize];
+            let current_line = self.buffer.line_mut(self.scroll_pos + self.cur_y);
             current_line.push(c);
         } else {
             if let Some((offset, _)) = self.buffer.grapheme_at(self.scroll_pos + self.cur_y, self.cur_x) {
-                let current_line = &mut self.buffer.contents[(self.scroll_pos + self.cur_y) as usize];
+                let current_line = self.buffer.line_mut(self.scroll_pos + self.cur_y);
                 current_line.insert(offset, c);
             }
         }
