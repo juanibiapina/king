@@ -190,14 +190,14 @@ impl Window {
     }
 
     pub fn add_char(&mut self, c: char) -> Result<()> {
-        let current_line = &mut self.buffer.contents[(self.scroll_pos + self.cur_y) as usize];
-
-        if (self.cur_x as usize) >= unicode::width(current_line) {
+        if (self.cur_x as usize) >= unicode::width(self.buffer.line(self.scroll_pos + self.cur_y)) {
+            let current_line = &mut self.buffer.contents[(self.scroll_pos + self.cur_y) as usize];
             current_line.push(c);
         } else {
-            let byte_pos = unicode::byte_index_for_grapheme_index(current_line, self.cur_x as usize);
-
-            current_line.insert(byte_pos, c);
+            if let Some((offset, _)) = self.buffer.grapheme_at(self.scroll_pos + self.cur_y, self.cur_x) {
+                let current_line = &mut self.buffer.contents[(self.scroll_pos + self.cur_y) as usize];
+                current_line.insert(offset, c);
+            }
         }
 
         self.cur_x += unicode::width_char(c) as i32;

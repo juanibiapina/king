@@ -112,6 +112,39 @@ fn when_there_is_content_i_does_not_move_the_cursor() {
 }
 
 #[test]
+fn inserting_text_when_there_are_widechars() {
+    let mut ed = Editor::new(10, 10);
+
+    ed.handle_key(&Key::Char('i')).unwrap();
+    input_text(&mut ed, "1😀ab");
+    ed.handle_key(&Key::Esc).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
+    input_text(&mut ed, "x");
+    ed.handle_key(&Key::Esc).unwrap();
+    assert_eq!(ed.window().content_view().line(0), "1😀axb");
+
+    ed.handle_key(&Key::Char('h')).unwrap();
+    ed.handle_key(&Key::Char('h')).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
+    input_text(&mut ed, "x");
+    ed.handle_key(&Key::Esc).unwrap();
+    assert_eq!(ed.window().content_view().line(0), "1😀xaxb");
+
+    ed.handle_key(&Key::Char('h')).unwrap();
+    ed.handle_key(&Key::Char('h')).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
+    input_text(&mut ed, "x");
+    ed.handle_key(&Key::Esc).unwrap();
+    assert_eq!(ed.window().content_view().line(0), "1x😀xaxb");
+
+    ed.handle_key(&Key::Char('h')).unwrap();
+    ed.handle_key(&Key::Char('i')).unwrap();
+    input_text(&mut ed, "y");
+    ed.handle_key(&Key::Esc).unwrap();
+    assert_eq!(ed.window().content_view().line(0), "1yx😀xaxb");
+}
+
+#[test]
 fn when_buffer_is_empty_a_enters_insert_mode() {
     let mut ed = Editor::new(10, 10);
 
