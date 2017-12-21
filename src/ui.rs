@@ -93,14 +93,14 @@ fn render_window(ed: &Editor) {
 
 fn render_text(text: &str, y: i32, x: i32) {
     let mut column = x;
-    for grapheme in unicode::graphemes(text, true) {
+    for (_, grapheme) in unicode::graphemes(text) {
         column += render_grapheme(grapheme, y, column) as i32;
     }
 }
 
 fn render_text_clipped(text: &str, y: i32, x: i32, width: i32) {
     let mut column = x;
-    for grapheme in unicode::graphemes(text, true) {
+    for (_, grapheme) in unicode::graphemes(text) {
         column += render_grapheme(grapheme, y, column) as i32;
 
         if column >= width {

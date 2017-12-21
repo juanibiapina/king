@@ -85,14 +85,14 @@ impl Window {
         let line = self.buffer.line(self.cur_y + self.scroll_pos);
         let line_width = unicode::width(line) as i32;
         if self.cur_x >= line_width {
-            if let Some(ref grapheme) = self.buffer.grapheme_at(self.cur_y + self.scroll_pos, line_width - 1) {
+            if let Some((_, ref grapheme)) = self.buffer.grapheme_at(self.cur_y + self.scroll_pos, line_width - 1) {
                 self.cur_x = line_width - (unicode::width(grapheme) as i32);
             }
         }
     }
 
     pub fn ensure_cursor_not_in_middle_of_widechar(&mut self) {
-        if let Some(ref grapheme) = self.buffer.grapheme_at(self.cur_y + self.scroll_pos, self.cur_x) {
+        if let Some((_, ref grapheme)) = self.buffer.grapheme_at(self.cur_y + self.scroll_pos, self.cur_x) {
             let size = unicode::width(grapheme) as i32;
             if size > 1 {
                 self.cur_x -= size - 1;
@@ -112,7 +112,7 @@ impl Window {
                 self.ensure_cursor_not_in_middle_of_widechar();
             },
             Movement::Right => {
-                if let Some(ref grapheme) = self.buffer.grapheme_at(self.cur_y + self.scroll_pos, self.cur_x) {
+                if let Some((_, ref grapheme)) = self.buffer.grapheme_at(self.cur_y + self.scroll_pos, self.cur_x) {
                     let size = unicode::width(grapheme) as i32;
                     let line_width = unicode::width(self.buffer.line(self.cur_y + self.scroll_pos)) as i32;
                     if self.cur_x + size < line_width {
@@ -221,11 +221,10 @@ impl Window {
         }
 
         let line_position = self.scroll_pos + self.cur_y;
-        let col_position = self.cur_x as usize;
 
-        let current_line = &mut self.buffer.contents[line_position as usize];
-        let c = current_line.remove(col_position - 1);
-        self.cur_x -= unicode::width_char(c) as i32;
+        if let Some(grapheme) = self.buffer.delete_char_at(line_position, self.cur_x - 1)? {
+            self.cur_x -= unicode::width(&grapheme) as i32;
+        }
 
         Ok(())
     }

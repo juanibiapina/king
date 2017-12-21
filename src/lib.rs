@@ -1,3 +1,5 @@
+#![feature(splice)]
+
 mod unicode;
 mod movement;
 mod prompt;

@@ -13,7 +13,6 @@ fn editor() -> Editor {
     ed
 }
 
-
 #[test]
 fn enter_and_exit() {
     let mut ed = editor();
@@ -55,12 +54,20 @@ fn entering_wide_chars_moves_the_cursor() {
 fn deleting_text_with_backspace() {
     let mut ed = editor();
 
-    input_text(&mut ed, "some text");
-    ed.handle_key(&Key::Backspace).unwrap();
-    ed.handle_key(&Key::Backspace).unwrap();
+    input_text(&mut ed, "some 😀a😀");
+    assert_eq!(ed.cursor(), (0, 10));
 
+    ed.handle_key(&Key::Backspace).unwrap();
+    assert_eq!(ed.cursor(), (0, 8));
+    assert_eq!(ed.window().content_view().line(0), "some 😀a");
+
+    ed.handle_key(&Key::Backspace).unwrap();
     assert_eq!(ed.cursor(), (0, 7));
-    assert_eq!(ed.window().content_view().line(0), "some te");
+    assert_eq!(ed.window().content_view().line(0), "some 😀");
+
+    ed.handle_key(&Key::Backspace).unwrap();
+    assert_eq!(ed.cursor(), (0, 5));
+    assert_eq!(ed.window().content_view().line(0), "some ");
 }
 
 #[test]

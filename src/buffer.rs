@@ -40,7 +40,7 @@ impl Buffer {
         Ok(())
     }
 
-    pub fn grapheme_at(&self, y: i32, x: i32) -> Option<String> {
+    pub fn grapheme_at(&self, y: i32, x: i32) -> Option<(usize, String)> {
         let line = &self.contents[y as usize];
 
         if x >= unicode::width(line) as i32 || x < 0 {
@@ -48,11 +48,11 @@ impl Buffer {
         }
 
         let mut current_column = 0;
-        for grapheme in unicode::graphemes(line, true) {
+        for (offset, grapheme) in unicode::graphemes(line) {
             let size = unicode::width(grapheme) as i32;
 
             if current_column + size > x {
-                return Some(grapheme.to_owned());
+                return Some((offset, grapheme.to_owned()));
             }
 
             current_column += size;
@@ -66,6 +66,16 @@ impl Buffer {
         let line = self.contents.remove(i + 1);
         self.contents[i].push_str(&line);
         Ok(())
+    }
+
+    pub fn delete_char_at(&mut self, y: i32, x: i32) -> Result<Option<String>> {
+        match self.grapheme_at(y, x) {
+            Some((offset, grapheme)) => {
+                self.contents[y as usize].splice(offset..(offset+grapheme.len()), "");
+                Ok(Some(grapheme))
+            },
+            None => Ok(None),
+        }
     }
 
     pub fn line(&self, n: i32) -> &str {
