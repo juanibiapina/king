@@ -189,6 +189,14 @@ impl Window {
         self.cur_x = 0;
     }
 
+    pub fn break_line(&mut self) -> Result<()> {
+        self.buffer.break_line(self.scroll_pos + self.cur_y, self.cur_x)?;
+        self.cur_y += 1;
+        self.cur_x = 0;
+
+        Ok(())
+    }
+
     pub fn add_char(&mut self, c: char) -> Result<()> {
         if (self.cur_x as usize) >= unicode::width(self.buffer.line(self.scroll_pos + self.cur_y)) {
             let current_line = self.buffer.line_mut(self.scroll_pos + self.cur_y);

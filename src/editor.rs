@@ -125,6 +125,7 @@ impl Editor {
             Some(ref command) => self.run_command(command),
             None => {
                 match *key {
+                    Key::Enter => self.window.break_line(),
                     Key::Char(c) => self.window.add_char(c),
                     _ => Ok(()),
                 }

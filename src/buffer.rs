@@ -40,6 +40,12 @@ impl Buffer {
         Ok(())
     }
 
+    pub fn break_line(&mut self, y: i32, x: i32) -> Result<()> {
+        let rest = self.contents[y as usize].split_off(x as usize);
+        self.contents.insert((y + 1) as usize, rest);
+        Ok(())
+    }
+
     pub fn grapheme_at(&self, y: i32, x: i32) -> Option<(usize, String)> {
         let line = &self.contents[y as usize];
 

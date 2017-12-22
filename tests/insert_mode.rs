@@ -112,6 +112,29 @@ fn when_there_is_content_i_does_not_move_the_cursor() {
 }
 
 #[test]
+fn enter_key() {
+    let mut ed = Editor::new(10, 10);
+
+    ed.handle_key(&Key::Char('i')).unwrap();
+    ed.handle_key(&Key::Enter).unwrap();
+    assert_eq!(ed.cursor(), (1, 0));
+    assert_eq!(ed.window().content_view().line(1), "");
+
+    input_text(&mut ed, "12");
+    ed.handle_key(&Key::Enter).unwrap();
+    assert_eq!(ed.cursor(), (2, 0));
+    assert_eq!(ed.window().content_view().line(2), "");
+
+    ed.handle_key(&Key::Esc).unwrap();
+    input_text(&mut ed, "kl");
+    ed.handle_key(&Key::Char('i')).unwrap();
+    ed.handle_key(&Key::Enter).unwrap();
+    assert_eq!(ed.cursor(), (2, 0));
+    assert_eq!(ed.window().content_view().line(1), "1");
+    assert_eq!(ed.window().content_view().line(2), "2");
+}
+
+#[test]
 fn inserting_text_when_there_are_widechars() {
     let mut ed = Editor::new(10, 10);
 
