@@ -7,12 +7,12 @@ pub struct Prompt {
     pub text: String,
     pub error: Option<String>,
     pub message: Option<String>,
-    pub pos_y: i32,
+    pub pos_y: usize,
     pub cur_x: usize,
 }
 
 impl Prompt {
-    pub fn new(y: i32) -> Prompt {
+    pub fn new(y: usize) -> Prompt {
         Prompt {
             text: "".to_owned(),
             error: None,

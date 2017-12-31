@@ -8,31 +8,31 @@ use unicode;
 
 pub struct Window {
     buffer: Buffer,
-    scroll_pos: i32,
-    cur_y: i32,
-    cur_x: i32,
-    height: i32,
-    width: i32,
+    scroll_pos: usize,
+    cur_y: usize,
+    cur_x: usize,
+    height: usize,
+    width: usize,
 }
 
 pub struct ContentView<'a> {
     buffer: &'a Buffer,
-    height: i32,
-    vertical_offset: i32,
+    height: usize,
+    vertical_offset: usize,
 }
 
 impl<'a> ContentView<'a> {
-    pub fn height(&self) -> i32 {
+    pub fn height(&self) -> usize {
         self.height
     }
 
-    pub fn line(&self, i: i32) -> &str {
+    pub fn line(&self, i: usize) -> &str {
         self.buffer.line(i + self.vertical_offset)
     }
 }
 
 impl Window {
-    pub fn new(height: i32, width: i32, buffer: Buffer) -> Window {
+    pub fn new(height: usize, width: usize, buffer: Buffer) -> Window {
         Window {
             buffer: buffer,
             scroll_pos: 0,
@@ -43,7 +43,7 @@ impl Window {
         }
     }
 
-    pub fn size(&self) -> (i32, i32) {
+    pub fn size(&self) -> (usize, usize) {
         (self.height, self.width)
     }
 
@@ -51,24 +51,24 @@ impl Window {
         self.buffer.filename()
     }
 
-    pub fn cursor(&self) -> (i32, i32) {
+    pub fn cursor(&self) -> (usize, usize) {
         (self.cur_y, self.cur_x)
     }
 
-    pub fn set_cur_x(&mut self, x: i32) {
+    pub fn set_cur_x(&mut self, x: usize) {
         self.cur_x = x;
     }
 
     pub fn content_view(&self) -> ContentView {
         ContentView {
             buffer: &self.buffer,
-            height: min(self.height, self.buffer.len() as i32),
+            height: min(self.height, self.buffer.len()),
             vertical_offset: self.scroll_pos,
         }
     }
 
     fn scroll_up(&mut self) {
-        let contents_len = self.buffer.len() as i32;
+        let contents_len = self.buffer.len();
 
         if self.cur_y + self.scroll_pos < contents_len - 1 {
             self.scroll_pos += 1;
@@ -83,17 +83,17 @@ impl Window {
 
     pub fn ensure_cursor_over_line(&mut self) {
         let line = self.buffer.line(self.cur_y + self.scroll_pos);
-        let line_width = unicode::width(line) as i32;
+        let line_width = unicode::width(line);
         if self.cur_x >= line_width {
-            if let Some((_, ref grapheme)) = self.buffer.grapheme_at(self.cur_y + self.scroll_pos, line_width - 1) {
-                self.cur_x = line_width - (unicode::width(grapheme) as i32);
+            if let Some((_, ref grapheme)) = self.buffer.grapheme_at(self.cur_y + self.scroll_pos, line_width.saturating_sub(1)) {
+                self.cur_x = line_width - unicode::width(grapheme);
             }
         }
     }
 
     pub fn ensure_cursor_not_in_middle_of_widechar(&mut self) {
         if let Some((_, ref grapheme)) = self.buffer.grapheme_at(self.cur_y + self.scroll_pos, self.cur_x) {
-            let size = unicode::width(grapheme) as i32;
+            let size = unicode::width(grapheme);
             if size > 1 {
                 self.cur_x -= size - 1;
             }
@@ -103,18 +103,16 @@ impl Window {
     pub fn move_cursor(&mut self, movement: Movement) -> Result<()> {
         match movement {
             Movement::Left => {
-                self.cur_x -= 1;
-
-                if self.cur_x < 0 {
-                    self.cur_x = 0;
+                if self.cur_x > 0 {
+                    self.cur_x -= 1;
                 }
 
                 self.ensure_cursor_not_in_middle_of_widechar();
             },
             Movement::Right => {
                 if let Some((_, ref grapheme)) = self.buffer.grapheme_at(self.cur_y + self.scroll_pos, self.cur_x) {
-                    let size = unicode::width(grapheme) as i32;
-                    let line_width = unicode::width(self.buffer.line(self.cur_y + self.scroll_pos)) as i32;
+                    let size = unicode::width(grapheme);
+                    let line_width = unicode::width(self.buffer.line(self.cur_y + self.scroll_pos));
                     if self.cur_x + size < line_width {
                         self.cur_x += size;
 
@@ -126,11 +124,9 @@ impl Window {
 
             },
             Movement::Up => {
-                self.cur_y -= 1;
-
-                if self.cur_y < 0 {
-                    self.cur_y = 0;
-
+                if self.cur_y > 0 {
+                    self.cur_y -= 1;
+                } else {
                     self.scroll_down();
                 }
 
@@ -146,7 +142,7 @@ impl Window {
                     self.scroll_up();
                 }
 
-                let contents_len = self.buffer.len() as i32;
+                let contents_len = self.buffer.len();
 
                 if self.cur_y >= contents_len {
                     self.cur_y = contents_len - 1;
@@ -162,7 +158,7 @@ impl Window {
 
     pub fn advance_cursor(&mut self) -> Result<()> {
         let line = self.buffer.line(self.scroll_pos + self.cur_y);
-        let line_len = unicode::width(line) as i32;
+        let line_len = unicode::width(line);
 
         if line_len > 0 {
             self.cur_x += 1;
@@ -198,7 +194,7 @@ impl Window {
     }
 
     pub fn add_char(&mut self, c: char) -> Result<()> {
-        if (self.cur_x as usize) >= unicode::width(self.buffer.line(self.scroll_pos + self.cur_y)) {
+        if self.cur_x >= unicode::width(self.buffer.line(self.scroll_pos + self.cur_y)) {
             let current_line = self.buffer.line_mut(self.scroll_pos + self.cur_y);
             current_line.push(c);
         } else {
@@ -208,7 +204,7 @@ impl Window {
             }
         }
 
-        self.cur_x += unicode::width_char(c) as i32;
+        self.cur_x += unicode::width_char(c);
 
         Ok(())
     }
@@ -218,7 +214,7 @@ impl Window {
             if self.cur_y == 0 {
                 return Ok(())
             } else {
-                let pos_x = unicode::width(self.buffer.line(self.cur_y - 1 + self.scroll_pos)) as i32;
+                let pos_x = unicode::width(self.buffer.line(self.cur_y - 1 + self.scroll_pos));
                 self.buffer.join_lines(self.cur_y - 1 + self.scroll_pos)?;
 
                 self.cur_y -= 1;
@@ -231,7 +227,7 @@ impl Window {
         let line_position = self.scroll_pos + self.cur_y;
 
         if let Some(grapheme) = self.buffer.delete_char_at(line_position, self.cur_x - 1)? {
-            self.cur_x -= unicode::width(&grapheme) as i32;
+            self.cur_x -= unicode::width(&grapheme);
         }
 
         Ok(())

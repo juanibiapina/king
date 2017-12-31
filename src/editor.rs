@@ -14,15 +14,15 @@ pub struct Editor {
     running: bool,
     pub prompt: Prompt,
     window: Window,
-    height: i32,
-    width: i32,
+    height: usize,
+    width: usize,
     normal_mappings: Mappings,
     insert_mappings: Mappings,
     prompt_mappings: Mappings,
 }
 
 impl Editor {
-    pub fn new(height: i32, width: i32) -> Editor {
+    pub fn new(height: usize, width: usize) -> Editor {
         let window = Window::new(height - 1, width, Buffer::new());
         let prompt = Prompt::new(height - 1);
 
@@ -70,7 +70,7 @@ impl Editor {
         self.mode
     }
 
-    pub fn size(&self) -> (i32, i32) {
+    pub fn size(&self) -> (usize, usize) {
         (self.height, self.width)
     }
 
@@ -86,10 +86,10 @@ impl Editor {
         self.prompt.display_error(text);
     }
 
-    pub fn cursor(&self) -> (i32, i32) {
+    pub fn cursor(&self) -> (usize, usize) {
         match self.mode {
             Mode::Normal | Mode::Insert => self.window.cursor(),
-            Mode::Prompt => (self.height - 1, self.prompt.cur_x as i32),
+            Mode::Prompt => (self.height - 1, self.prompt.cur_x),
         }
     }
 

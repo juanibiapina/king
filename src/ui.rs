@@ -17,12 +17,12 @@ pub fn init() {
     check(nc::nonl());
 }
 
-pub fn getmaxy() -> i32 {
-    nc::getmaxy(nc::stdscr())
+pub fn getmaxy() -> usize {
+    nc::getmaxy(nc::stdscr()) as usize
 }
 
-pub fn getmaxx() -> i32 {
-    nc::getmaxx(nc::stdscr())
+pub fn getmaxx() -> usize {
+    nc::getmaxx(nc::stdscr()) as usize
 }
 
 pub fn finish() {
@@ -42,8 +42,8 @@ pub fn render(ed: &Editor) {
     nc::refresh();
 }
 
-fn render_cursor(y: i32, x: i32) {
-    nc::mv(y, x);
+fn render_cursor(y: usize, x: usize) {
+    nc::mv(y as i32, x as i32);
 }
 
 fn render_prompt(ed: &Editor) {
@@ -69,13 +69,13 @@ fn render_window(ed: &Editor) {
             break;
         }
 
-        if row >= content_view.height() as i32 {
+        if row >= content_view.height() {
             break;
         }
 
         let line = content_view.line(row);
 
-        if unicode::width(line) <= width as usize {
+        if unicode::width(line) <= width {
             render_text(line, row, 0);
         } else {
             render_text_clipped(line, row, 0, width);
@@ -91,17 +91,17 @@ fn render_window(ed: &Editor) {
     }
 }
 
-fn render_text(text: &str, y: i32, x: i32) {
+fn render_text(text: &str, y: usize, x: usize) {
     let mut column = x;
     for (_, grapheme) in unicode::graphemes(text) {
-        column += render_grapheme(grapheme, y, column) as i32;
+        column += render_grapheme(grapheme, y, column);
     }
 }
 
-fn render_text_clipped(text: &str, y: i32, x: i32, width: i32) {
+fn render_text_clipped(text: &str, y: usize, x: usize, width: usize) {
     let mut column = x;
     for (_, grapheme) in unicode::graphemes(text) {
-        column += render_grapheme(grapheme, y, column) as i32;
+        column += render_grapheme(grapheme, y, column);
 
         if column >= width {
             break;
@@ -109,7 +109,7 @@ fn render_text_clipped(text: &str, y: i32, x: i32, width: i32) {
     }
 }
 
-fn render_grapheme(grapheme: &str, y: i32, x: i32) -> usize {
+fn render_grapheme(grapheme: &str, y: usize, x: usize) -> usize {
     mv(y, x);
     addstr(grapheme);
 
@@ -120,8 +120,8 @@ fn addstr(s: &str) {
     nc::addstr(s);
 }
 
-fn mv(y: i32, x: i32) {
-    check(nc::mv(y, x));
+fn mv(y: usize, x: usize) {
+    check(nc::mv(y as i32, x as i32));
 }
 
 fn erase() {
