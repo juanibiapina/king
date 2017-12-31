@@ -142,7 +142,7 @@ impl Editor {
     fn run_prompt(&mut self) -> Result<()> {
         self.switch_to_normal();
 
-        let text = self.prompt.get_text();
+        let text = self.prompt.command_text().to_owned();
         self.prompt.clear();
 
         if text.is_empty() {

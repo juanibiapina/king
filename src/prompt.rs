@@ -32,10 +32,6 @@ impl Prompt {
         self.add_char(starting_char)
     }
 
-    pub fn get_text(&self) -> String {
-        self.command_text.clone()
-    }
-
     pub fn clear(&mut self) {
         self.command_text = "".to_owned();
         self.message = None;
