@@ -82,7 +82,7 @@ impl Editor {
     }
 
     pub fn display_error(&mut self, text: &str) {
-        self.prompt.display_error(text);
+        self.prompt.display_message(text);
     }
 
     pub fn cursor(&self) -> (usize, usize) {
