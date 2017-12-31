@@ -176,7 +176,7 @@ impl Editor {
     fn delete_char_in_prompt(&mut self) -> Result<()> {
         self.prompt.delete_grapheme();
 
-        if self.prompt.text.is_empty() {
+        if self.prompt.command_text().is_empty() {
             self.switch_to_normal();
         }
 

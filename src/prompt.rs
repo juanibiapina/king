@@ -4,7 +4,7 @@ use error::Result;
 use unicode;
 
 pub struct Prompt {
-    pub text: String,
+    text: String,
     pub error: Option<String>,
     pub message: Option<String>,
     pub pos_y: usize,
@@ -20,6 +20,10 @@ impl Prompt {
             pos_y: y,
             cur_x: 0,
         }
+    }
+
+    pub fn command_text(&self) -> &str {
+        &self.text
     }
 
     pub fn start(&mut self, starting_char: char) -> Result<()> {

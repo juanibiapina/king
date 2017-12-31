@@ -13,7 +13,7 @@ fn typing_text() {
 
     input_text(&mut ed, ":abc");
 
-    assert_eq!(ed.prompt.text, ":abc");
+    assert_eq!(ed.prompt.command_text(), ":abc");
 }
 
 #[test]
@@ -23,7 +23,7 @@ fn deleting_text() {
     input_text(&mut ed, ":abc");
     ed.handle_key(&Key::Backspace).unwrap();
 
-    assert_eq!(ed.prompt.text, ":ab");
+    assert_eq!(ed.prompt.command_text(), ":ab");
 }
 
 #[test]
@@ -35,7 +35,7 @@ fn deleting_last_character() {
     ed.handle_key(&Key::Backspace).unwrap();
 
     assert_eq!(ed.mode(), Mode::Normal);
-    assert_eq!(ed.prompt.text, "");
+    assert_eq!(ed.prompt.command_text(), "");
     assert_eq!(ed.prompt.error, None);
     assert_eq!(ed.prompt.message, None);
     assert_eq!(ed.prompt.cur_x, 0);
@@ -49,7 +49,7 @@ fn leave_prompt_with_escape() {
     ed.handle_key(&Key::Esc).unwrap();
 
     assert_eq!(ed.mode(), Mode::Normal);
-    assert_eq!(ed.prompt.text, "");
+    assert_eq!(ed.prompt.command_text(), "");
     assert_eq!(ed.prompt.error, None);
     assert_eq!(ed.prompt.message, None);
     assert_eq!(ed.prompt.cur_x, 0);

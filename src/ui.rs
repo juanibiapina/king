@@ -52,7 +52,7 @@ fn render_prompt(ed: &Editor) {
         None => {
             match ed.prompt.message {
                 Some(ref text) => render_text(text, ed.prompt.pos_y, 0),
-                None => render_text(&ed.prompt.text, ed.prompt.pos_y, 0),
+                None => render_text(ed.prompt.command_text(), ed.prompt.pos_y, 0),
             };
         },
     };
