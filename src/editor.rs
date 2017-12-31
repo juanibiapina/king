@@ -7,7 +7,6 @@ use buffer::Buffer;
 use mode::Mode;
 use window::Window;
 use mappings::Mappings;
-use unicode;
 
 pub struct Editor {
     mode: Mode,
@@ -175,9 +174,7 @@ impl Editor {
     }
 
     fn delete_char_in_prompt(&mut self) -> Result<()> {
-        if let Some(c) = self.prompt.text.pop() {
-            self.prompt.cur_x -= unicode::width_char(c);
-        }
+        self.prompt.delete_grapheme();
 
         if self.prompt.text.is_empty() {
             self.switch_to_normal();

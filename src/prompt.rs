@@ -47,6 +47,12 @@ impl Prompt {
         self.message = Some(text.to_owned());
     }
 
+    pub fn delete_grapheme(&mut self) {
+        if let Some(c) = self.text.pop() {
+            self.cur_x -= unicode::width_char(c);
+        }
+    }
+
     pub fn add_char(&mut self, c: char) -> Result<()> {
         self.text.push(c);
         self.cur_x += unicode::width_char(c);
