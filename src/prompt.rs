@@ -5,7 +5,7 @@ use unicode;
 
 pub struct Prompt {
     command_text: String,
-    pub message: Option<String>,
+    message: Option<String>,
     pub pos_y: usize,
     pub cur_x: usize,
 }
