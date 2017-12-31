@@ -178,7 +178,6 @@ impl Editor {
 
         if self.prompt.text.is_empty() {
             self.switch_to_normal();
-            self.prompt.clear();
         }
 
         Ok(())
