@@ -4,7 +4,7 @@ use error::Result;
 use unicode;
 
 pub struct Prompt {
-    text: String,
+    command_text: String,
     pub error: Option<String>,
     pub message: Option<String>,
     pub pos_y: usize,
@@ -14,7 +14,7 @@ pub struct Prompt {
 impl Prompt {
     pub fn new(y: usize) -> Prompt {
         Prompt {
-            text: "".to_owned(),
+            command_text: "".to_owned(),
             error: None,
             message: None,
             pos_y: y,
@@ -23,7 +23,7 @@ impl Prompt {
     }
 
     pub fn command_text(&self) -> &str {
-        &self.text
+        &self.command_text
     }
 
     pub fn start(&mut self, starting_char: char) -> Result<()> {
@@ -33,11 +33,11 @@ impl Prompt {
     }
 
     pub fn get_text(&self) -> String {
-        self.text.clone()
+        self.command_text.clone()
     }
 
     pub fn clear(&mut self) {
-        self.text = "".to_owned();
+        self.command_text = "".to_owned();
         self.message = None;
         self.error = None;
         self.cur_x = 0;
@@ -52,13 +52,13 @@ impl Prompt {
     }
 
     pub fn delete_grapheme(&mut self) {
-        if let Some(c) = self.text.pop() {
+        if let Some(c) = self.command_text.pop() {
             self.cur_x -= unicode::width_char(c);
         }
     }
 
     pub fn add_char(&mut self, c: char) -> Result<()> {
-        self.text.push(c);
+        self.command_text.push(c);
         self.cur_x += unicode::width_char(c);
 
         Ok(())
