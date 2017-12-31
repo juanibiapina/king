@@ -22,6 +22,18 @@ impl Prompt {
         }
     }
 
+    pub fn text(&self) -> &str {
+        match self.error {
+            Some(ref text) => text,
+            None => {
+                match self.message {
+                    Some(ref text) => text,
+                    None => &self.command_text,
+                }
+            },
+        }
+    }
+
     pub fn command_text(&self) -> &str {
         &self.command_text
     }

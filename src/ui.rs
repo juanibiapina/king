@@ -47,15 +47,7 @@ fn render_cursor(y: usize, x: usize) {
 }
 
 fn render_prompt(ed: &Editor) {
-    match ed.prompt.error {
-        Some(ref text) => render_text(text, ed.prompt.pos_y, 0),
-        None => {
-            match ed.prompt.message {
-                Some(ref text) => render_text(text, ed.prompt.pos_y, 0),
-                None => render_text(ed.prompt.command_text(), ed.prompt.pos_y, 0),
-            };
-        },
-    };
+    render_text(ed.prompt.text(), ed.prompt.pos_y, 0);
 }
 
 fn render_window(ed: &Editor) {
