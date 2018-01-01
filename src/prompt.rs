@@ -6,8 +6,8 @@ use unicode;
 pub struct Prompt {
     command_text: String,
     message: Option<String>,
-    pub pos_y: usize,
-    pub cur_x: usize,
+    pos_y: usize,
+    cur_x: usize,
 }
 
 impl Prompt {
@@ -18,6 +18,14 @@ impl Prompt {
             pos_y: y,
             cur_x: 0,
         }
+    }
+
+    pub fn pos(&self) -> usize {
+        self.pos_y
+    }
+
+    pub fn cursor(&self) -> usize {
+        self.cur_x
     }
 
     pub fn text(&self) -> &str {

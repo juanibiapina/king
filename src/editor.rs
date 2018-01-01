@@ -92,7 +92,7 @@ impl Editor {
     pub fn cursor(&self) -> (usize, usize) {
         match self.mode {
             Mode::Normal | Mode::Insert => self.window.cursor(),
-            Mode::Prompt => (self.height - 1, self.prompt.cur_x),
+            Mode::Prompt => (self.height - 1, self.prompt.cursor()),
         }
     }
 

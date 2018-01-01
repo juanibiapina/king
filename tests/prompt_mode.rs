@@ -36,7 +36,7 @@ fn deleting_last_character() {
 
     assert_eq!(ed.mode(), Mode::Normal);
     assert_eq!(ed.prompt().command_text(), "");
-    assert_eq!(ed.prompt().cur_x, 0);
+    assert_eq!(ed.prompt().cursor(), 0);
 }
 
 #[test]
@@ -48,7 +48,7 @@ fn leave_prompt_with_escape() {
 
     assert_eq!(ed.mode(), Mode::Normal);
     assert_eq!(ed.prompt().command_text(), "");
-    assert_eq!(ed.prompt().cur_x, 0);
+    assert_eq!(ed.prompt().cursor(), 0);
 }
 
 #[test]
