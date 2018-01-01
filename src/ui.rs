@@ -47,7 +47,7 @@ fn render_cursor(y: usize, x: usize) {
 }
 
 fn render_prompt(ed: &Editor) {
-    render_text(ed.prompt.text(), ed.prompt.pos_y, 0);
+    render_text(ed.prompt().text(), ed.prompt().pos_y, 0);
 }
 
 fn render_window(ed: &Editor) {

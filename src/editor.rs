@@ -11,7 +11,7 @@ use mappings::Mappings;
 pub struct Editor {
     mode: Mode,
     running: bool,
-    pub prompt: Prompt,
+    prompt: Prompt,
     window: Window,
     height: usize,
     width: usize,
@@ -63,6 +63,10 @@ impl Editor {
 
     pub fn window(&self) -> &Window {
         &self.window
+    }
+
+    pub fn prompt(&self) -> &Prompt {
+        &self.prompt
     }
 
     pub fn mode(&self) -> Mode {

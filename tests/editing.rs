@@ -15,7 +15,7 @@ fn editing_a_file_that_exists() {
     ed.handle_key(&Key::Enter).unwrap();
 
     assert_eq!(ed.mode(), Mode::Normal);
-    assert_eq!(ed.prompt.text(), "\"tests/fixtures/file_with_contents\"");
+    assert_eq!(ed.prompt().text(), "\"tests/fixtures/file_with_contents\"");
 }
 
 #[test]
