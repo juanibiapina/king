@@ -161,7 +161,7 @@ impl Editor {
     fn run_command(&mut self, command: &Command) -> Result<()> {
         match *command {
             Command::Quit => self.exit(),
-            Command::Write => self.window.write(),
+            Command::Write => self.write(),
             Command::Edit(ref filename) => self.edit(filename),
             Command::EnterPrompt(c) => self.enter_prompt(c),
             Command::CancelPrompt => self.cancel_prompt(),
@@ -175,6 +175,13 @@ impl Editor {
             Command::DeleteCharBeforeCursorInPrompt => self.delete_char_in_prompt(),
             Command::Movement(movement) => self.window.move_cursor(movement),
         }
+    }
+
+    fn write(&mut self) -> Result<()> {
+        self.window.write()?;
+        self.prompt.display_message("File written");
+
+        Ok(())
     }
 
     fn delete_char_in_prompt(&mut self) -> Result<()> {
